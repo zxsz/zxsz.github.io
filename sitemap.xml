@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yoursite.com/2017/10/06/2017-09-14-openssh/</loc>
+    
+    <lastmod>2017-10-06T07:22:24.233Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2017/10/06/2017-07-30-regex/</loc>
+    
+    <lastmod>2017-10-06T07:20:26.065Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/2017/10/06/2017-09-25-dns/</loc>
     
     <lastmod>2017-10-06T07:03:01.631Z</lastmod>
@@ -51,21 +65,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/2017/10/06/2017-07-30-regex/</loc>
-    
-    <lastmod>2017-10-06T07:03:01.630Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2017/10/06/2017-08-22-nmcli/</loc>
-    
-    <lastmod>2017-10-06T07:03:01.630Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2017/10/06/2017-07-31-find/</loc>
+    <loc>http://yoursite.com/2017/10/06/2017-07-20-link/</loc>
     
     <lastmod>2017-10-06T07:03:01.630Z</lastmod>
     
@@ -93,13 +93,6 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/2017/10/06/2017-07-20-link/</loc>
-    
-    <lastmod>2017-10-06T07:03:01.630Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://yoursite.com/2017/10/06/2017-08-12-disk/</loc>
     
     <lastmod>2017-10-06T07:03:01.630Z</lastmod>
@@ -107,7 +100,14 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/2017/10/06/2017-09-14-openssh/</loc>
+    <loc>http://yoursite.com/2017/10/06/2017-08-12-mkiso/</loc>
+    
+    <lastmod>2017-10-06T07:03:01.630Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/2017/10/06/2017-07-31-find/</loc>
     
     <lastmod>2017-10-06T07:03:01.630Z</lastmod>
     
@@ -128,7 +128,7 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/2017/10/06/2017-08-12-mkiso/</loc>
+    <loc>http://yoursite.com/2017/10/06/2017-08-22-nmcli/</loc>
     
     <lastmod>2017-10-06T07:03:01.630Z</lastmod>
     
