@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>硬链接与软链接 | zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="linxu系统上，简单理解文件和目录的存储方式，从根本上理解软连接和硬链接">
+<meta name="keywords" content="ln">
+<meta property="og:type" content="article">
+<meta property="og:title" content="硬链接与软链接">
+<meta property="og:url" content="http://yoursite.com/2017/10/06/2017-07-20-link/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:description" content="linxu系统上，简单理解文件和目录的存储方式，从根本上理解软连接和硬链接">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://47.91.157.219/images/inode.png">
+<meta property="og:updated_time" content="2017-10-06T07:03:01.630Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="硬链接与软链接">
+<meta name="twitter:description" content="linxu系统上，简单理解文件和目录的存储方式，从根本上理解软连接和硬链接">
+<meta name="twitter:image" content="http://47.91.157.219/images/inode.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-07-20-link" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-07-20-link/" class="article-date">
+  <time datetime="2017-10-06T07:03:51.175Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux基础/">linux基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      硬链接与软链接
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="什么是链接"><a href="#什么是链接" class="headerlink" title="什么是链接"></a>什么是链接</h2><p>你可以将链接简单地理解为 Windows 中常见的快捷方式，Linux 中常用它来解决一些库版本的问题，<br>通常也会将一些目录层次较深的文件链接到一个更易访问的目录中。在这些用途上，我们通常会使用到软链接（也称符号链接）。</p>
+<a id="more"></a>
+<blockquote>
+<p>简单了解文件和目录在文件系统上的存储方式</p>
+</blockquote>
+<p>磁盘分区在被格式化后会被格式化，简单理解就是将空间划分相同大小的块<br>大概为4K，同时建立一张索引表:inode</p>
+<p><img src="http://47.91.157.219/images/inode.png" alt="图1"></p>
+<p><strong>文件inode表的内容大致包括</strong></p>
+<ul>
+<li>mode ：文件类型</li>
+<li>owership  ：属组和属主</li>
+<li>size ：文件大小</li>
+<li>timestamps：时间戳</li>
+<li>inode编号</li>
+<li>数据块指针</li>
+</ul>
+<p><strong>目录的inode的内容</strong></p>
+<ul>
+<li>文件名</li>
+<li>文件inode指针</li>
+</ul>
+<p>例如： cat /etc/issue 系统通过文件系统寻找文件的过程大概为</p>
+<p>系统寻找根目录打开根目录的列表找文件名为issue的inode的记录，在尾部找到文件的inod编号，找到对应文件的inode表，通过尾部的数据块指针，从而从磁盘块中找到对应的数据</p>
+<p><strong>软连接的indode</strong></p>
+<p>软连接是一个文件，与普通文件 a 唯一的不同的是：尾部的指针。普通文件尾部的指针记录了文件所在的数据块编号，而软连接的尾部的指针指向的是里一个文件的inode编号，所以如果源文件被删除，软连接就会找不到数据块无法访问数据而失效</p>
+<p><strong>硬链接的inode表</strong></p>
+<p>硬链接不会创建自己的inode表，而是在原本文件上再增加，一条记录，并有自己的文件名。所以硬链接与被链接的文件inode编号一样，只是有不同的文件名而已，<br>    *注：同一个分区内inode编号是唯一的，不同的分区中的innode表各自有指向自己分区的指针，所以硬链接不可以跨分区创建。</p>
+<blockquote>
+<p>查询inode表的相关命令</p>
+</blockquote>
+<pre><code>[root@localhost ~]# df -i          
+Filesystem       Inodes IUsed    IFree IUse% Mounted on
+/dev/sda2      10485760 68733 10417027    1% /
+devtmpfs          58031   378    57653    1% /dev
+tmpfs             60482     1    60481    1% /dev/shm
+tmpfs             60482   472    60010    1% /run
+tmpfs             60482    16    60466    1% /sys/fs/cgroup
+/dev/sda1        102400   330   102070    1% /boot
+tmpfs             60482     1    60481    1% /run/user/0
+</code></pre><p><em>查看各个分区inode表的总量和利用情况</em></p>
+<pre><code>[root@localhost ~]# ls -i /root/
+33574986 2ping.sh  33574979 anaconda-ks.cfg  33574990 fstab
+</code></pre><p><em>查看目录下inode编号</em></p>
+<pre><code>[root@localhost ~]# stat anaconda-ks.cfg 
+  File: ‘anaconda-ks.cfg’
+  Size: 1426          Blocks: 8          IO Block: 4096   regular file
+Device: 802h/2050d    Inode: 33574979    Links: 1
+Access: (0600/-rw-------)  Uid: (    0/    root)   Gid: (    0/    root)
+Context: system_u:object_r:admin_home_t:s0
+Access: 2017-07-19 17:41:32.465411463 +0800
+Modify: 2017-07-14 16:28:59.815991919 +0800
+Change: 2017-07-14 16:28:59.815991919 +0800
+ Birth: -
+</code></pre><p><em>比较详细的方式查看文件的inod表中的信息，和占据磁盘块的大小个数，还有硬链接的个数</em></p>
+<blockquote>
+<p>硬链接和软连接的创建</p>
+</blockquote>
+<p><strong>创建链接的命令非常简单例如：</strong></p>
+<p>Useage：ln [-s] FILENAME  LINKNAME</p>
+<pre><code>[root@localhost app]# ln a.txt b.txt    ##创建a.txt--&gt;b.txt的硬链接
+[root@localhost app]# ll -i
+total 0
+33590001 -rw-r--r--. 2 root root 0 Jul 19 21:33 a.txt
+33590001 -rw-r--r--. 2 root root 0 Jul 19 21:33 b.txt
+</code></pre><p><em>可以看到文件的inode编号，一样</em></p>
+<p><strong>创建软连接</strong></p>
+<pre><code>[root@localhost app]# ln -s a.txt c
+
+[root@localhost app]# ll c
+lrwxrwxrwx. 1 root root 5 jul 19 21:42 c -&gt; a.txt
+</code></pre><p><em>注意：用相对路径创建软连接此处有巨坑 </em></p>
+<p>如果在同一个目录下，创建没有什么直接写文件名就好了，不需要写全路径</p>
+<p>如果不在同一个目录下， 如下目录结构</p>
+<pre><code>    /app
+├── a.txt
+├── b.txt
+├── c -&gt; a.txt
+├── dir1
+│   └── dir2
+└── f1
+</code></pre><p>想要在目录dir2 下创建 f1 文件的软连接  当前目录为/app</p>
+<pre><code>[root@localhost app]# ln -s f1 /app/dir1/dir2/f2
+</code></pre><p><em>这种写法错了，软连接失效但是系统不会报错</em>  请使用 ls -l 查看</p>
+<p><strong>正确的写法1：</strong></p>
+<pre><code>ln -s /app/f1 /app/dir1/dir2/f3
+</code></pre><p><em>filename  和  linkname  全用绝对路径</em></p>
+<p><strong>正确的写法2:</strong></p>
+<pre><code>ln -s ../../f1 /app/dir1/dir2/f4
+</code></pre><p>注：使用相对路径的写法，和一般的相对路径不是一样，不是相对当前工作目录的路径，而是 filename 参考 linkname 的相对路径</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-07-20-link/" data-id="cj8fk3et50000gx7xw2i4j00k" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ln/">ln</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/10/06/2017-09-25-dns/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">bind+blz+mariadb 构建智能DNS</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是链接"><span class="toc-number">1.</span> <span class="toc-text">什么是链接</span></a></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

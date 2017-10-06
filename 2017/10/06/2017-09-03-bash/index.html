@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>bash变量高级用法 | zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="数组和普通变量不一样的,数组是多个元素的的连续的内存空间,相当与多个变量的集合.在一些脚本中需要定义一大堆变量是使用. 数组有两类 索引数组 (下标为数字的就是索引数组) 和 关联数组 (下标不为数字为自定义的字符串)">
+<meta name="keywords" content="bash">
+<meta property="og:type" content="article">
+<meta property="og:title" content="bash变量高级用法">
+<meta property="og:url" content="http://yoursite.com/2017/10/06/2017-09-03-bash/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:description" content="数组和普通变量不一样的,数组是多个元素的的连续的内存空间,相当与多个变量的集合.在一些脚本中需要定义一大堆变量是使用. 数组有两类 索引数组 (下标为数字的就是索引数组) 和 关联数组 (下标不为数字为自定义的字符串)">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-10-06T07:03:01.630Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="bash变量高级用法">
+<meta name="twitter:description" content="数组和普通变量不一样的,数组是多个元素的的连续的内存空间,相当与多个变量的集合.在一些脚本中需要定义一大堆变量是使用. 数组有两类 索引数组 (下标为数字的就是索引数组) 和 关联数组 (下标不为数字为自定义的字符串)">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-03-bash" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-09-03-bash/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.630Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/shell脚本/">shell脚本</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      bash变量高级用法
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h4 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h4><p>和普通变量不一样的,数组是多个元素的的连续的内存空间,相当与多个变量的集合.在一些脚本中需要定义一大堆变量是使用. 数组有两类 <code>索引数组</code> (下标为数字的就是索引数组) 和 <code>关联数组</code> (下标不为数字为自定义的字符串)</p>
+<a id="more"></a>
+<blockquote>
+<p>声明/赋值/引用</p>
+</blockquote>
+<p><code>devlare -a ARRAY_NAME</code> 表示声明一个索引数组 ,可以不声明直接赋值</p>
+<p><code>declare -A ARRAY_NAME</code> 表示声明一个关联数组 , 赋值前必须先声明</p>
+<blockquote>
+<p>索引数组赋值例如:</p>
+</blockquote>
+<p>语法:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">name=(value1 value2 ... valueN)</div></pre></td></tr></table></figure>
+<p>例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">filename=(/etc/*)              # 其中() 内可以是任何命令生成的列表</div><div class="line">echo $&#123;filename[0]&#125;            # [0]  是引用第一个索引号的值</div><div class="line">echo $&#123;filename&#125;               # 不写下标默认引用第一个</div><div class="line">echo $&#123;#filename[*]&#125;           # 引用所有元素个数</div><div class="line">echo $&#123;!filename[*]&#125;           # 引用数组的所有下标</div></pre></td></tr></table></figure>
+<p>注意:索引数组下标默认从0开始,所以最大的下标数为 所有数组元素个数-1</p>
+<blockquote>
+<p>关联数组赋值例如:</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">declare -A week                                      # 关联数组赋值前必须声明,下标可自定义字符串</div><div class="line">week=([mon]=&quot;星期一&quot; [tue]=&quot;星期二&quot;  [wed]=&quot;星期三&quot;)   </div><div class="line">[root: ~]# echo $&#123;week[wed]&#125;                         # 引用单个下标的值</div><div class="line">星期三</div><div class="line">[root: ~]# echo $&#123;!week[*]&#125;                          # 引用所有下标</div><div class="line">mon tue wed</div><div class="line">[root: ~]# echo $&#123;week[*]&#125;                           # 引用所有下标的值</div><div class="line">星期一 星期二 星期三</div></pre></td></tr></table></figure>
+<blockquote>
+<p>应用数组脚本例子:</p>
+</blockquote>
+<p>冒泡排序: 随机生成一些数字然后排序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">#</div><div class="line"># while flag=&quot;-gt&quot; find then max number from array ,else find min</div><div class="line">find_max () &#123;</div><div class="line">    for((j=$1;j&lt;$&#123;#rand[*]&#125;;j++)) ;do</div><div class="line">        [[ &quot;$2&quot; == &quot;-r&quot; ]] &amp;&amp; flag=-lt || flag=-gt</div><div class="line">        if [ $&#123;rand[$j]&#125; $flag $&#123;rand[$1]&#125; ];then</div><div class="line">            tmp=$&#123;rand[$1]&#125;</div><div class="line">            rand[$1]=$&#123;rand[$j]&#125;</div><div class="line">            rand[$j]=$tmp</div><div class="line">        fi</div><div class="line">    done</div><div class="line">&#125;</div><div class="line"># generate a array ( 15 numbers )</div><div class="line">declare -a rand</div><div class="line">for((i=0;i&lt;15;i++));do</div><div class="line">    rand[$i]=$RANDOM</div><div class="line">done</div><div class="line">echo &quot;random unmber:&quot;</div><div class="line">echo $&#123;rand[*]&#125;</div><div class="line"># sort the array from big to small</div><div class="line">bu_sort () &#123;</div><div class="line">    for((k=0;k&lt;$[$&#123;#rand[*]&#125;-1];k++));do</div><div class="line">        find_max $k $1</div><div class="line">    done</div><div class="line">    if [ -z &quot;$1&quot; ];then</div><div class="line">        echo &quot;sort form big to small:&quot;</div><div class="line">    else</div><div class="line">        echo &quot;sort from small to big:&quot;</div><div class="line">    fi</div><div class="line">    echo $&#123;rand[*]&#125;</div><div class="line">&#125;</div><div class="line">bu_sort</div><div class="line">bu_sort -r</div></pre></td></tr></table></figure>
+<p>简单解析  <code>find_max ()</code> 函数的作用是找出最大值或最小值,与<code>$1</code>  互换值; <code>bu_sort ()</code> 循环传递参数给 <code>find_max()</code></p>
+<p>以数组下标从小到大开始传递 </p>
+<blockquote>
+<p>执行效果如下:</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root: archive]# bash bubble_sort.sh </div><div class="line">random unmber:</div><div class="line">11604 29655 24404 10818 4669 14564 14949 2907 31907 18988 12139 30330 119 12814 300</div><div class="line">sort form big to small:</div><div class="line">31907 30330 29655 24404 18988 14949 14564 12814 12139 11604 10818 4669 2907 300 119</div><div class="line">sort from small to big:</div><div class="line">119 300 2907 4669 10818 11604 12139 12814 14564 14949 18988 24404 29655 30330 31907</div></pre></td></tr></table></figure>
+<h4 id="间接引用"><a href="#间接引用" class="headerlink" title="间接引用"></a>间接引用</h4><p>如果第一个变量的值是第二个变量的名字，从第一个变量引用第二个变量的值就称为间接变量引用</p>
+<p>例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root: ~]# name=zhang;age=20;gender=F</div><div class="line">[root: ~]# record=age             # 变量record的值age是里一个变量的变量名</div><div class="line">[root: ~]# echo $&#123;record&#125;         # 普通引用只能引用变量名</div><div class="line">age</div><div class="line">[root: ~]# echo $&#123;!record&#125;         # &quot;!&quot; 可以间接引用出age的值</div><div class="line">20</div></pre></td></tr></table></figure>
+<p>注意:如果变量是数组<code>!</code> 引用的是数组的下标</p>
+<blockquote>
+<p>eval 命令</p>
+</blockquote>
+<p>eval命令将会首先扫描命令行进行所有的置换，然后再执行该命令。该命令适用于那些一次扫描无法实现其功能的变量.该命令对变量进行两次扫描</p>
+<p>例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root: ~]# eval echo \$$record</div><div class="line">20</div></pre></td></tr></table></figure>
+<p>注: 在执行echo 命令之前eval 会先将命令行扫描一遍.将 <code>$record</code> 变成age ,由于<code>\$</code> 转义了,所有不会将认为后面的字符串为变量,eval扫描一遍后,显示的就是 <code>echo $age</code> , 当然eval 一般不会这么用</p>
+<p>例如: <code>{1..$n}</code> 扩展中不支持使用变量,这是也已利用eval命令先扫描一遍,把变量变成值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">n=10;eval echo &#123;1..$n&#125;</div></pre></td></tr></table></figure>
+<h4 id="按长度引用"><a href="#按长度引用" class="headerlink" title="按长度引用"></a>按长度引用</h4><blockquote>
+<p>引用方法</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$&#123;var:offset:number&#125;      # offer表偏移量  ,numner表是取的个数</div></pre></td></tr></table></figure>
+<blockquote>
+<p>例子 ,这中用法不多,不多介绍</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root: ~]# var=abcdefghihk</div><div class="line">[root: ~]# echo $&#123;#var&#125;              #表示引用变量字符个数,和数组一样</div><div class="line">11</div><div class="line">[root: ~]# echo $&#123;var:2:3&#125;           #表示从左向右跳过2个字符,取三个字符</div><div class="line">cde</div></pre></td></tr></table></figure>
+<h4 id="判断状态"><a href="#判断状态" class="headerlink" title="判断状态"></a>判断状态</h4><p>对于变量的状态(<code>set</code>或<code>unset</code>)和值是否为空(<code>null</code>)，bash提供四种方式扩展</p>
+<p><code>${parameter:-word}</code> 如果变量状态为unset或值为空，返回<code>word</code>的结果值，否则返回变量的值。</p>
+<p><code>${parameter:=word}</code> 如果变量状态为unset或值为空，<code>word</code>的结果会赋值给变量，然后返回变量值</p>
+<p><code>${parameter:?word}</code> 如果变量状态为unset或值为空，<code>word</code>的结果值会被输出到标准错误，如果shell是非交互的(如脚本中)则退出(exit)；否则展开为变量的值。</p>
+<p><code>${parameter:+word}</code> 如果变量状态为unset或值为空，什么也不返回，否则返回<code>word</code>的结果值。</p>
+<p>注意:以上此种判断方式对于位置变量”<code>$1</code>  <code>$2</code>  等不能使用”</p>
+<p>系统脚本中有很多这个写法,例如 <code>/etc/init.d/functions</code> 文件中有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"># Get a sane screen width</div><div class="line">[ -z &quot;$&#123;COLUMNS:-&#125;&quot; ] &amp;&amp; COLUMNS=80     # 表示COLUMNS变量空或unset状态就赋值为 80</div><div class="line">[ -z &quot;$&#123;CONSOLETYPE:-&#125;&quot; ] &amp;&amp; CONSOLETYPE=&quot;$(/sbin/consoletype)&quot;</div><div class="line">...</div></pre></td></tr></table></figure>
+<h4 id="字符串切片"><a href="#字符串切片" class="headerlink" title="字符串切片"></a>字符串切片</h4><p>有如下几种表达方式:</p>
+<p><code>${var#*word}</code>：从左向右配置第一个<code>word</code> 关键词,去掉word和word之前的字符</p>
+<p><code>${var##*word}</code>: 从左向右配置最后一个<code>word</code> 关键词,去掉word和word之前的字符</p>
+<p><code>${var%word*}</code>: 从右向左配置第一个<code>word</code> 关键词,去掉word和word之后的字符</p>
+<p><code>${var%%word*}</code>:从右向左配置最后一个<code>word</code> 关键词,去掉word和word之后的字符</p>
+<blockquote>
+<p>例如</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root: ~]# url=https://zxslinux.github.io:80</div><div class="line">[root: ~]# echo $&#123;url##*/&#125;</div><div class="line">zxslinux.github.io:80</div><div class="line">[root: ~]# echo $&#123;url%:*&#125;</div><div class="line">https://zxslinux.github.io</div><div class="line">[root: ~]# echo $&#123;url%%:*&#125;</div><div class="line">https</div></pre></td></tr></table></figure>
+<h4 id="查找替换"><a href="#查找替换" class="headerlink" title="查找替换"></a>查找替换</h4><blockquote>
+<p>格式</p>
+</blockquote>
+<p><code>${var/pattern/substr}</code> ：查找var所表示的字符串中，第一次被pattern所匹配到的字符串，以substr替换之</p>
+<p><code>${var//pattern/substr}</code> : 查找var所表示的字符串中，所有能被pattern所匹配到的字符串，以substr替换之</p>
+<p><code>${var/#pattern/substr}</code> ：查找var所表示的字符串中，行首被pattern所匹配到的字符串，以substr替换之</p>
+<p><code>${var/%pattern/substr}</code> ：查找var所表示的字符串中，行尾被pattern所匹配到的字符串，以substr替换之</p>
+<blockquote>
+<p>例子</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root: ~]# string=123456abcdef</div><div class="line">[root: ~]# echo $&#123;string/[0-9]/@&#125;           #只替换第一次匹配[0-9]的字符</div><div class="line">@23456abcdef	</div><div class="line">[root: ~]# echo $&#123;string//[0-9]/@&#125;          #替换所有匹配[0-9]的字符</div><div class="line">@@@@@@abcdef</div><div class="line">[root: ~]# echo $&#123;string/#*6/@&#125;             #替换以&quot;*6&quot;开头的字符串为&quot;@&quot;</div><div class="line">@abcdef</div><div class="line">[root: ~]# echo $&#123;string/%c*/@&#125;             #替换以&quot;c*&quot;结尾的字符串为&quot;@&quot;</div><div class="line">123456ab@</div></pre></td></tr></table></figure>
+<h4 id="大小写转换"><a href="#大小写转换" class="headerlink" title="大小写转换"></a>大小写转换</h4><p>表示方法有: <code>${var^}</code> ,<code>${var^^}</code> ,<code>${var,}</code>, <code>${var,,}</code></p>
+<p>其中”^”: 表示转换首字符为大写, “^^” : 表示转换全部为大写.  相应的 “,” 表示转成小写 </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-09-03-bash/" data-id="cj8fk3ev5000pgx7xypzo0pi1" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bash/">bash</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2017/10/06/2017-07-30-regex/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          bash正则表达式
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#数组"><span class="toc-number">1.</span> <span class="toc-text">数组</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#间接引用"><span class="toc-number">2.</span> <span class="toc-text">间接引用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#按长度引用"><span class="toc-number">3.</span> <span class="toc-text">按长度引用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#判断状态"><span class="toc-number">4.</span> <span class="toc-text">判断状态</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#字符串切片"><span class="toc-number">5.</span> <span class="toc-text">字符串切片</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#查找替换"><span class="toc-number">6.</span> <span class="toc-text">查找替换</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#大小写转换"><span class="toc-number">7.</span> <span class="toc-text">大小写转换</span></a></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>centos7 systemd | zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="系统启动和服务器守护进程管理器，负责在系统启动或运行时，激活系统资源，服务器进程和其它进程">
+<meta name="keywords" content="systemctl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="centos7 systemd">
+<meta property="og:url" content="http://yoursite.com/2017/10/06/2017-09-08-systemd/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:description" content="系统启动和服务器守护进程管理器，负责在系统启动或运行时，激活系统资源，服务器进程和其它进程">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-10-06T07:03:01.631Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="centos7 systemd">
+<meta name="twitter:description" content="系统启动和服务器守护进程管理器，负责在系统启动或运行时，激活系统资源，服务器进程和其它进程">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-08-systemd" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-09-08-systemd/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.631Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux基础/">linux基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      centos7 systemd
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h3 id="systemd简介"><a href="#systemd简介" class="headerlink" title="systemd简介"></a>systemd简介</h3><p>centos6 之前一直采用的是<code>sysVinit</code> ,是内核加载完成后,启动的第一个进程(pid 为1), 主要用于管理系统各种服务的启动<br><code>/etc/rc.d/init.d/*</code> 目录下的文件就是启动各类服务的脚本文件.</p>
+<p>由于<code>init</code> 程序只是用来执行脚本的,<code>init</code> 程序按照配置文件<code>/etc/inittab</code>中的次序,启动各个对应路径下的脚本文件,导致开机速度慢,服务脚本冗长,且功能单一</p>
+<a id="more"></a>
+<p><code>Systemd</code> 因此为解决这些问题诞生,再centos7 中systemd 就是系统启动的第一个进程, 接管了系统的各个方面, 控制着系统的几乎所有源(service ,scoket 等).</p>
+<blockquote>
+<p>Sytemd较init程序的一些新特性</p>
+</blockquote>
+<ul>
+<li>系统引导时实现并行启动</li>
+<li>按需启动守护进程</li>
+<li>自动化服务依赖关系管理</li>
+<li>同时采用socket式与D-Bus总线式激活服务</li>
+<li>支持系统状态快照</li>
+</ul>
+<p>systemd 之所以能够并行启动,是因为systemd并不是真正的启动服务,而是类似<code>xinetd</code> 这个超级守护进程类似,帮进程监听端口,当服务被访问时才将这个服务唤醒,和根据服务的配置文件中,定义的依赖关系,唤醒依赖的服务和进程. 这个配置文件叫做 <code>Unit</code></p>
+<h3 id="systemd核心概念"><a href="#systemd核心概念" class="headerlink" title="systemd核心概念"></a>systemd核心概念</h3><p>unit表示不同类型的systemd对象，通过配置文件进行标识和配置；文件中主要包含了系统服务、监听socket、保存的系统快照以及其它与init相关的信息,</p>
+<p>运行下面命令,可查看所有Unit 类型</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# systemctl -t help</div><div class="line">automount  device     path       snapshot   swap       timer      </div><div class="line">busname    mount      service    socket     target</div></pre></td></tr></table></figure>
+<p>unit单元的命名都是,服务名称加类型后缀 例如 <code>httpd.service</code>  <code>telnet.socket</code></p>
+<blockquote>
+<p>各种unit类型表示含义如下</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>unit类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>.service</td>
+<td>定义系统服务</td>
+</tr>
+<tr>
+<td>.target</td>
+<td>模拟运行级别的</td>
+</tr>
+<tr>
+<td>.device   .swap</td>
+<td>用于定义内核识别的设备/交换分区</td>
+</tr>
+<tr>
+<td>.mount   .automount</td>
+<td>定义文件系统挂载点/自动挂载</td>
+</tr>
+<tr>
+<td>.snapshot</td>
+<td>管理系统快照</td>
+</tr>
+<tr>
+<td>.path</td>
+<td>用于定义文件系统中的一个文件或目录使用,常用于当文件系统变化时，延迟激活服务</td>
+</tr>
+<tr>
+<td>.socket</td>
+<td>用于标识进程间通信用的socket文件，也可在系统启动时，延迟启动服务，实现按需启动</td>
+</tr>
+</tbody>
+</table>
+<h3 id="重要目录和文件"><a href="#重要目录和文件" class="headerlink" title="重要目录和文件"></a>重要目录和文件</h3><ul>
+<li>/usr/lib/systemd/system/ 这个目录下,包含了所有的unit 文件</li>
+<li>/run/systemd/system/ 这个目录是系统执行过程中产生的脚本</li>
+<li>/etc/systemd/system/ 这个目录文件较少,绝大多数都是指向,/usr/lib/systemd/system 目录下的个文件.</li>
+</ul>
+<h3 id="systemd加载文件次序"><a href="#systemd加载文件次序" class="headerlink" title="systemd加载文件次序"></a>systemd加载文件次序</h3><p>systemd启动找的第一配置文件是 <code>/etc/systemd/default.target</code> , 这个文间的内容如下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[Unit]</div><div class="line">Description=Multi-User System</div><div class="line">Documentation=man:systemd.special(7)</div><div class="line">Requires=basic.target</div><div class="line">Conflicts=rescue.service rescue.target</div><div class="line">After=basic.target rescue.service rescue.target</div><div class="line">AllowIsolate=yes</div></pre></td></tr></table></figure>
+<p>其中: <code>Requires</code> 表示需求(强制依赖的) . 这个程序启动是强制依赖 <code>basic.target</code> ,所以系统再去找 <code>basic.target</code> 直到启动所有依赖的<code>unit</code> </p>
+<p>根据unit文件的引导,大致启动的次序为:</p>
+<ol>
+<li>执行sysinit.target 初始化系统</li>
+<li>执行basic.target 设置操作系统环境</li>
+<li>执行multi-user.target下的本机与服务器服务</li>
+<li>执行multi-user.target下的/etc/rc.d/rc.local</li>
+<li>执行multi-user.target下的getty.target及登录服务</li>
+</ol>
+<h3 id="管理命令"><a href="#管理命令" class="headerlink" title="管理命令"></a>管理命令</h3><p>主要是管理<code>.service</code> 类的,以<code>httpd.service</code> 为例,其中后缀可以省略</p>
+<h4 id="服务重启-重载-停止"><a href="#服务重启-重载-停止" class="headerlink" title="服务重启/重载/停止"></a>服务重启/重载/停止</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 条件式重启：已启动才重启，否则不做操作</div><div class="line">systemctl try-restart httpd</div><div class="line"><span class="meta">#</span> 重载或重启服务：先加载，再启动</div><div class="line">systemctl reload-or-restart httpd.service</div><div class="line"><span class="meta">#</span> 重载或条件式重启服务</div><div class="line">systemctl reload-or-try-restart httpd.service</div><div class="line"><span class="meta">#</span> 设定某服务开机自启</div><div class="line">systemctl enable httpd.service</div><div class="line"><span class="meta">#</span> 设定某服务开机禁止启动</div><div class="line">systemctl disable httpd.service</div><div class="line"><span class="meta">#</span> 禁止自动和手动启动</div><div class="line">systemctl mask httpd.service</div><div class="line"><span class="meta">#</span> 取消禁止</div><div class="line">systemctl unmask httpd.service</div></pre></td></tr></table></figure>
+<p>禁止启动实际上是创建etc/systemd/system/httpd.service 指向/dev/nul 下的软连接</p>
+<h4 id="服务状态查看"><a href="#服务状态查看" class="headerlink" title="服务状态查看"></a>服务状态查看</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 查看某服务当前激活与否的状态</div><div class="line">systemctl status httpd.service</div><div class="line"><span class="meta">#</span> 查看所有util的开机自启状态</div><div class="line">systemctl list-units --type --all</div><div class="line"><span class="meta">#</span> 查看所有service的开机自启状态</div><div class="line">systemctl list-units --type service</div><div class="line"><span class="meta">#</span> 查看当前激活的所有服务状态</div><div class="line">systemctl list-unit-files --type service</div><div class="line"><span class="meta">#</span> 列出失败的服务</div><div class="line">systemctl --failed --type=service</div><div class="line"><span class="meta">#</span> 查看服务的依赖关系</div><div class="line">systemctl list-dependencies name.service</div><div class="line"><span class="meta">#</span> 查看unit设置的详细信息</div><div class="line">systemctl show httpd.service</div><div class="line"><span class="meta">#</span> 查看指定unit的内容</div><div class="line">systemctl cat httpd.service</div></pre></td></tr></table></figure>
+<h4 id="切换运行级别"><a href="#切换运行级别" class="headerlink" title="切换运行级别"></a>切换运行级别</h4><p>systemd 已经没有运行级别,但保留了原来的说法, .target就是与运行级别有关</p>
+<p>multi-user.target 对应原来的 2 3 4  级别 , poweroff.target 对应 0 级别 ,reboot.target 对应 6 级别, graphical.target 对应 5 级别 , rescue.target 对应 1 级别</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 获取当前运行级别</div><div class="line">systemctl get-default</div><div class="line"><span class="meta">#</span> 设置运行级别 ,自动补全在这有问题</div><div class="line">systemctl set-default multi-user.target</div><div class="line"><span class="meta">#</span> 切换救援模式</div><div class="line">systemctl rescue</div><div class="line"><span class="meta">#</span> 切换到紧急救援模式</div><div class="line">systemctl emergency</div></pre></td></tr></table></figure>
+<h4 id="其他相关命令"><a href="#其他相关命令" class="headerlink" title="其他相关命令"></a>其他相关命令</h4><blockquote>
+<p>设置主机名</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 查看主机名信息</div><div class="line">hostnamectl </div><div class="line"><span class="meta">#</span> 设置主机名,注意会同步到配置文件</div><div class="line">hostnamectl set-hostname www.zxs.com</div></pre></td></tr></table></figure>
+<blockquote>
+<p>设置字符集</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 查看本地字符集,键盘映射</div><div class="line">localectl</div><div class="line"><span class="meta">#</span> 设置字符集</div><div class="line">localectl set-locale LANG=en_US.utf8</div></pre></td></tr></table></figure>
+<blockquote>
+<p>设置时钟</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 设置时区,注意 cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 貌似无效</div><div class="line">timedatectl set-timezone America/New_York</div></pre></td></tr></table></figure>
+<blockquote>
+<p>查看登陆会话</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 查看所有会话简要信息</div><div class="line">loginctl list-sessions</div><div class="line"><span class="meta">#</span> 查看会话的详细信息,后跟sessionID</div><div class="line">loginctl session-status 2</div></pre></td></tr></table></figure>
+<h3 id="Unit配置文件"><a href="#Unit配置文件" class="headerlink" title="Unit配置文件"></a>Unit配置文件</h3><p>查看下 httpd.service 文件的内容命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# systemctl cat httpd.service</div></pre></td></tr></table></figure>
+<p>unit 服务配置文件分为三个部分</p>
+<p><code>[Unit]</code> 定义与Unit类型无关的通用选项；用于提供unit的描述信息、unit行为及依赖关系等</p>
+<p><code>[Service]</code> 与特定类型相关的专用选项；此处为Service类型</p>
+<p><code>[Install]</code> 定义由“systemctl enable”以及”systemctldisable“命令在实现服务启用或禁用时用到的一些选项</p>
+<h4 id="区块的指令含义"><a href="#区块的指令含义" class="headerlink" title="区块的指令含义"></a>区块的指令含义</h4><blockquote>
+<p>[Unit] 指令</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Description</td>
+<td>描述信息</td>
+</tr>
+<tr>
+<td>After</td>
+<td>定义unit的启动次序，表示当前unit应该晚于哪些unit启动，其功能与Before相反</td>
+</tr>
+<tr>
+<td>Requires</td>
+<td>依赖到的其它units，强依赖，被依赖的units无法激活时，当前unit也无法激活</td>
+</tr>
+<tr>
+<td>Wants</td>
+<td>依赖到的其它units，弱依赖</td>
+</tr>
+<tr>
+<td>Conflicts</td>
+<td>定义units间的冲突关系</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>[Server] 段常用选项</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type=simple</td>
+<td>默认值，这个daemon主要由ExecStart接的指令串来启动，启动后常驻于内存中</td>
+</tr>
+<tr>
+<td>Type=forking</td>
+<td>由ExecStart启动的程序透过spawns延伸出其他子程序来作为此daemon的主要服务。原生父程序在启动结束后就会终止</td>
+</tr>
+<tr>
+<td>Type=oneshot</td>
+<td>与simple类似，不过这个程序在工作完毕后就结束了，不会常驻在内存中</td>
+</tr>
+<tr>
+<td>Type=dbus</td>
+<td>与simple类似，但这个daemon必须要在取得一个D-Bus的名称后，才会继续运作.因此通常也要同时设定BusNname= 才行</td>
+</tr>
+<tr>
+<td>Type=notify</td>
+<td>在启动完成后会发送一个通知消息。还需要配合NotifyAccess 来让 Systemd 接收消息</td>
+</tr>
+<tr>
+<td>Type=idle</td>
+<td>与simple类似，要执行这个daemon必须要所有的工作都顺利执行完毕后才会执行。这类的daemon通常是开机到最后才执行即可的服务</td>
+</tr>
+<tr>
+<td>EnvironmentFile</td>
+<td>环境配置文件</td>
+</tr>
+<tr>
+<td>ExecStart</td>
+<td>指明启动unit要运行命令或脚本的绝对路径</td>
+</tr>
+<tr>
+<td>ExecStartPre</td>
+<td>ExecStart前运行</td>
+</tr>
+<tr>
+<td>ExecStartPost</td>
+<td>ExecStart后运行</td>
+</tr>
+<tr>
+<td>ExecStop</td>
+<td>指明停止unit要运行的命令或脚本</td>
+</tr>
+<tr>
+<td>Restart</td>
+<td>当设定Restart=1 时，则当次daemon服务意外终止后，会再次自动启动此服务</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>[Install] 段常用选项</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alias</td>
+<td>别名，可使用systemctl command Alias.service</td>
+</tr>
+<tr>
+<td>RequiredBy</td>
+<td>被哪些units所依赖，强依赖</td>
+</tr>
+<tr>
+<td>WantedBy</td>
+<td>被哪些units所依赖，弱依赖</td>
+</tr>
+<tr>
+<td>Also</td>
+<td>安装本服务的时候还要安装别的相关服务</td>
+</tr>
+</tbody>
+</table>
+<h4 id="系统http-service分析"><a href="#系统http-service分析" class="headerlink" title="系统http.service分析"></a>系统http.service分析</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# systemctl cat httpd.service </div><div class="line"><span class="meta">#</span> /usr/lib/systemd/system/httpd.service</div><div class="line">[Unit]</div><div class="line">Description=The Apache HTTP Server</div><div class="line">After=network.target remote-fs.target nss-lookup.target</div><div class="line">Documentation=man:httpd(8)</div><div class="line">Documentation=man:apachectl(8)</div><div class="line"></div><div class="line">[Service]</div><div class="line">Type=notify</div><div class="line">EnvironmentFile=/etc/sysconfig/httpd</div><div class="line">ExecStart=/usr/sbin/httpd $OPTIONS -DFOREGROUND</div><div class="line">ExecReload=/usr/sbin/httpd $OPTIONS -k graceful</div><div class="line">ExecStop=/bin/kill -WINCH $&#123;MAINPID&#125;</div></pre></td></tr></table></figure>
+<p>[Unit] 区块与启动相无关, 主要分析 [Service] 区块</p>
+<p>EnvironmentFile=/etc/sysconfig/httpd        指定的是httpd的环境配置文件,不是主配置文件</p>
+<p>ExecStart 表示启动进程的二进制文件, 编译安装的apachectl 也可以启动</p>
+<p><code>OPTIONS</code> 是 环境配置文件的变量, 可支持的参数可以 <code>man httpd</code> </p>
+<p><code>MAINPID</code> 是主进程的id号</p>
+<blockquote>
+<p>例如</p>
+</blockquote>
+<p>编译安装apache时,稍作修改 系统中的<code>unit</code> 的配置文件,修改程序的路径即可 , </p>
+<pre><code class="shell">[Unit]
+Description=The Apache HTTP Server
+After=network.target remote-fs.target nss-lookup.target
+Documentation=man:httpd(8)
+Documentation=man:apachectl(8)
+
+[Service]
+<span class="meta">#</span>Type=notify
+<span class="meta">#</span>EnvironmentFile=/etc/sysconfig/httpd      # 编译安装没有这个环境文件注释掉
+ExecStart=/usr/local/apache2/bin/httpd $OPTIONS -DFOREGROUND    # 修改路径
+ExecReload=/usr/local/apache2/bin/httpd $OPTIONS -k graceful    # 修改路径
+ExecStop=/bin/kill -WINCH ${MAINPID}
+</code></pre>
+<h3 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h3><p><a href="http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-part-two.html" target="_blank" rel="external">Systemd 入门教程：实战篇</a></p>
+<p><a href="http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html" target="_blank" rel="external">Systemd 入门教程：命令篇</a></p>
+<p><a href="http://www.jinbuguo.com/systemd/index.html" target="_blank" rel="external">systemd.index 中文手册</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-09-08-systemd/" data-id="cj8fk3evj000zgx7xj1gqbi5d" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/systemctl/">systemctl</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2017/10/06/2017-08-03-rpm/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          程序包管理
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/10/06/2017-08-24-proc/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">进程管理</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#systemd简介"><span class="toc-number">1.</span> <span class="toc-text">systemd简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#systemd核心概念"><span class="toc-number">2.</span> <span class="toc-text">systemd核心概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#重要目录和文件"><span class="toc-number">3.</span> <span class="toc-text">重要目录和文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#systemd加载文件次序"><span class="toc-number">4.</span> <span class="toc-text">systemd加载文件次序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#管理命令"><span class="toc-number">5.</span> <span class="toc-text">管理命令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#服务重启-重载-停止"><span class="toc-number">5.1.</span> <span class="toc-text">服务重启/重载/停止</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#服务状态查看"><span class="toc-number">5.2.</span> <span class="toc-text">服务状态查看</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#切换运行级别"><span class="toc-number">5.3.</span> <span class="toc-text">切换运行级别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#其他相关命令"><span class="toc-number">5.4.</span> <span class="toc-text">其他相关命令</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Unit配置文件"><span class="toc-number">6.</span> <span class="toc-text">Unit配置文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#区块的指令含义"><span class="toc-number">6.1.</span> <span class="toc-text">区块的指令含义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#系统http-service分析"><span class="toc-number">6.2.</span> <span class="toc-text">系统http.service分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关链接"><span class="toc-number">7.</span> <span class="toc-text">相关链接</span></a></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

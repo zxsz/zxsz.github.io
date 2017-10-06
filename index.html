@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="zxs">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="zxs">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-2017-07-20-link" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-07-20-link/" class="article-date">
+  <time datetime="2017-10-06T07:03:51.175Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux基础/">linux基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/06/2017-07-20-link/">硬链接与软链接</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="什么是链接"><a href="#什么是链接" class="headerlink" title="什么是链接"></a>什么是链接</h2><p>你可以将链接简单地理解为 Windows 中常见的快捷方式，Linux 中常用它来解决一些库版本的问题，<br>通常也会将一些目录层次较深的文件链接到一个更易访问的目录中。在这些用途上，我们通常会使用到软链接（也称符号链接）。</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/06/2017-07-20-link/#more">继续阅读全文 »</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-07-20-link/" data-id="cj8fk3et50000gx7xw2i4j00k" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ln/">ln</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-2017-09-25-dns" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-09-25-dns/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.631Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/服务器架设/">服务器架设</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/06/2017-09-25-dns/">bind+blz+mariadb 构建智能DNS</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>最近学了bind和mysql基础,纯属为了练习操作,巩固知识,和理解bind和mysql是如何通过 blz结合的. 智能DNS的原理很简单, 当客户端访问同一个网站域名时,通过bind的view视图功能,匹配不同ip的客户端去查找不同zone下的A记录,解析到理客户端最近的服务器ip地址,以提高网站的访问速度 .这个功能正好符合中国南电信北网通的基本国情.</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/06/2017-09-25-dns/#more">继续阅读全文 »</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-09-25-dns/" data-id="cj8fk3ewj001hgx7xv3n0hqlo" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DNS/">DNS</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-2017-09-18-cobbler" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-09-18-cobbler/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.631Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/自动化运维/">自动化运维</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/06/2017-09-18-cobbler/">cobbler</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Cobbler简介"><a href="#Cobbler简介" class="headerlink" title="Cobbler简介"></a>Cobbler简介</h3><p>简单理解 Cobbler就是 DHCP服务器 + TFTP服务器 + yum源服务器(httpd文件传输) 的综合管理平台, 支持众多的发行版：Red Hat、Fedora、CentOS、Debian、Ubuntu 和 SuSE .<br>下面演示的 centos6.9 系统下安装部署 Cobbler</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/06/2017-09-18-cobbler/#more">继续阅读全文 »</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-09-18-cobbler/" data-id="cj8fk3ewc001ggx7x9xnvwzdp" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kickstart/">kickstart</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pxe/">pxe</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-2017-09-10-openssl" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-09-10-openssl/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.631Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/安全/">安全</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/06/2017-09-10-openssl/">opessl和CA</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="openssl简介"><a href="#openssl简介" class="headerlink" title="openssl简介"></a>openssl简介</h3><p><code>openssl</code> 用于实现<code>http</code> <code>ftp</code> <code>smtp</code> 等一些应用层的加密传输,保证数据的安全性. http 协议等本身不具备加密解密的功能,  数据在明文在网上传输 , 对于一些保密性要求高的行业,(电商,网银支付的) ,以<code>https</code> 开头的就表示加密传输的 .</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/06/2017-09-10-openssl/#more">继续阅读全文 »</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-09-10-openssl/" data-id="cj8fk3evu0012gx7xeurefhy0" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openssl/">openssl</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-2017-08-03-rpm" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-08-03-rpm/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.631Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux基础/">linux基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/06/2017-08-03-rpm/">程序包管理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="程序包管理工具"><a href="#程序包管理工具" class="headerlink" title="程序包管理工具"></a>程序包管理工具</h3><p>redhat 系linux的包管理工具为 rpm，基于rpm 的前端管理工具为 yum 。<br>yum 需要配置yum仓库，可根据repodata数据自动解决软件包依赖关系。<br>.rpm结尾的文件rpm命令就可安装，无法自动解决包的依赖关系. </p>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/06/2017-08-03-rpm/#more">继续阅读全文 »</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-08-03-rpm/" data-id="cj8fk3eu20006gx7xhtghy4ho" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/rpm/">rpm</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/yum/">yum</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-2017-09-08-systemd" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-09-08-systemd/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.631Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux基础/">linux基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/06/2017-09-08-systemd/">centos7 systemd</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="systemd简介"><a href="#systemd简介" class="headerlink" title="systemd简介"></a>systemd简介</h3><p>centos6 之前一直采用的是<code>sysVinit</code> ,是内核加载完成后,启动的第一个进程(pid 为1), 主要用于管理系统各种服务的启动<br><code>/etc/rc.d/init.d/*</code> 目录下的文件就是启动各类服务的脚本文件.</p>
+<p>由于<code>init</code> 程序只是用来执行脚本的,<code>init</code> 程序按照配置文件<code>/etc/inittab</code>中的次序,启动各个对应路径下的脚本文件,导致开机速度慢,服务脚本冗长,且功能单一</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/06/2017-09-08-systemd/#more">继续阅读全文 »</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-09-08-systemd/" data-id="cj8fk3evj000zgx7xj1gqbi5d" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/systemctl/">systemctl</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-2017-08-24-proc" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-08-24-proc/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.631Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux基础/">linux基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/06/2017-08-24-proc/">进程管理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="linux进程管理"><a href="#linux进程管理" class="headerlink" title="linux进程管理"></a>linux进程管理</h3><p>操作系统的内存空间,简单可以认为分用户空间和内核空间,内核负责管理分配内存.在单个进程看来整个内存中只有自己和内核存在.内核总通过维护一张数据结构<code>task structure</code>的表,记录包括进程id,进程的父子进程id,程序运行到哪个阶段,内存地址真正指向物理内存的位置等等.</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/06/2017-08-24-proc/#more">继续阅读全文 »</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-08-24-proc/" data-id="cj8fk3ev2000mgx7xpnp0kv2f" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ps/">ps</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/top/">top</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-2017-08-20-route" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-08-20-route/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.631Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/网络管理/">网络管理</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/06/2017-08-20-route/">搭建简单路由器实验</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="实验原理"><a href="#实验原理" class="headerlink" title="实验原理"></a>实验原理</h3><p>路由器交换机的本质上也是一台linux系统的服务器,只不过是专门高度定制只用来做路由<br>功能,centos系列系统支持路由转发,只是默认没有开启.只要修改内核参数<code>/proc/sys/net/ipv4/ip_foward=1</code> 在加上几个网卡就能当路由器用了.</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/06/2017-08-20-route/#more">继续阅读全文 »</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-08-20-route/" data-id="cj8fk3eus000fgx7x6dfs30es" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ifconfig/">ifconfig</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ip/">ip</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-2017-07-31-find" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-07-31-find/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.630Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux基础/">linux基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/06/2017-07-31-find/">find命令使用总结</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="locate命令"><a href="#locate命令" class="headerlink" title="locate命令"></a>locate命令</h3><p>linxu系统查找文件的命令与 localte 和 find ，locate命令依赖于系统上实现创建的索引库，查找速度较快find则是实时查找，查找精确速度较慢，本文主要讲解 find 命令的用法</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/06/2017-07-31-find/#more">继续阅读全文 »</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-07-31-find/" data-id="cj8fk3etz0005gx7xknqm1h8d" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/find/">find</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-2017-08-22-nmcli" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-08-22-nmcli/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.630Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/网络管理/">网络管理</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/10/06/2017-08-22-nmcli/">centos7,nmcli工具</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="nmcli简介"><a href="#nmcli简介" class="headerlink" title="nmcli简介"></a>nmcli简介</h2><p>nmcli (NetworManager Client),是NetworkManager的程序的客户端,需要安装并启动服务进程.<br>nmccli 工具集子命令,异常的多.好在centos7,支持子命令补全功能,需要安装<code>bash-completion</code><br>软件包,安装好后 <code>su -</code> 重新重新初始下工作环境就可以生效了</p>
+        
+          <p class="article-more-link">
+            <a href="/2017/10/06/2017-08-22-nmcli/#more">继续阅读全文 »</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-08-22-nmcli/" data-id="cj8fk3euv000igx7x03aksb6v" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nmcli/">nmcli</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+
+
+  <nav id="page-nav">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页&raquo;</a>
+  </nav>
+</section>
+           
+    <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+     
+        <h3 class="follow-title ">Follow me</h3>
+     
+    <div class="widget follow">
+      
+              <a class="github" aria-hidden="true" href="https://github.com/giscafer" target="_blank" title="Github"></a>
+      
+      
+            <a class="weibo" aria-hidden="true"  href="http://weibo.com/laohoubin" target="_blank" title="微博"></a>
+      
+      
+              <a class="zhihu" aria-hidden="true"  href="http://www.zhihu.com/people/giscafer" target="_blank" title="知乎"></a>
+      
+      
+            <a class="email" aria-hidden="true"  href="mailto:zhangxingshi@aliyun.com" target="_blank" title="邮箱"></a>
+      
+    </div>
+  </div>
+
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title categories">分类</h3>
+    <div class="widget" id="categories">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/linux基础/">linux基础</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/shell脚本/">shell脚本</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/服务器架设/">服务器架设</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/正则表达式/">正则表达式</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络管理/">网络管理</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/自动化运维/">自动化运维</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title tagcloud">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/DNS/" style="font-size: 14px;">DNS</a> <a href="/tags/awk/" style="font-size: 14px;">awk</a> <a href="/tags/bash/" style="font-size: 14px;">bash</a> <a href="/tags/fdisk/" style="font-size: 14px;">fdisk</a> <a href="/tags/find/" style="font-size: 14px;">find</a> <a href="/tags/ifconfig/" style="font-size: 14px;">ifconfig</a> <a href="/tags/ip/" style="font-size: 14px;">ip</a> <a href="/tags/kickstart/" style="font-size: 14px;">kickstart</a> <a href="/tags/ln/" style="font-size: 14px;">ln</a> <a href="/tags/mkdvdiso-sh/" style="font-size: 14px;">mkdvdiso.sh</a> <a href="/tags/nmcli/" style="font-size: 14px;">nmcli</a> <a href="/tags/openssl/" style="font-size: 14px;">openssl</a> <a href="/tags/parted/" style="font-size: 14px;">parted</a> <a href="/tags/ps/" style="font-size: 14px;">ps</a> <a href="/tags/pxe/" style="font-size: 14px;">pxe</a> <a href="/tags/regex/" style="font-size: 14px;">regex</a> <a href="/tags/rpm/" style="font-size: 14px;">rpm</a> <a href="/tags/semanage/" style="font-size: 14px;">semanage</a> <a href="/tags/setfacl/" style="font-size: 14px;">setfacl</a> <a href="/tags/ssh/" style="font-size: 14px;">ssh</a> <a href="/tags/sudo/" style="font-size: 14px;">sudo</a> <a href="/tags/systemctl/" style="font-size: 14px;">systemctl</a> <a href="/tags/top/" style="font-size: 14px;">top</a> <a href="/tags/yum/" style="font-size: 14px;">yum</a> <a href="/tags/端口转发/" style="font-size: 14px;">端口转发</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title recent-posts">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/10/06/2017-07-20-link/">硬链接与软链接</a>
+          </li>
+        
+          <li>
+            <a href="/2017/10/06/2017-09-25-dns/">bind+blz+mariadb 构建智能DNS</a>
+          </li>
+        
+          <li>
+            <a href="/2017/10/06/2017-09-18-cobbler/">cobbler</a>
+          </li>
+        
+          <li>
+            <a href="/2017/10/06/2017-09-10-openssl/">opessl和CA</a>
+          </li>
+        
+          <li>
+            <a href="/2017/10/06/2017-08-03-rpm/">程序包管理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title archive">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">十月 2017</a><span class="archive-list-count">20</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+<div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+        <ul>
+            
+            <li>
+                <a href="http://www.magedu.com">马哥教育</a>
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+  
+    <!--微信公众号二维码-->
+
+  <div class="widget-wrap">
+    <h3 class="follow-title ">微信公众号</h3>
+    <div class="widget wechat-widget">
+        <img src="http://blog.zxs.com/images/wchat.png" alt="扫码关注" width="250"/>
+    </div>
+  </div>
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>centos7,nmcli工具 | zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="nmcli简介nmcli (NetworManager Client),是NetworkManager的程序的客户端,需要安装并启动服务进程.nmccli 工具集子命令,异常的多.好在centos7,支持子命令补全功能,需要安装bash-completion软件包,安装好后 su - 重新重新初始下工作环境就可以生效了">
+<meta name="keywords" content="nmcli">
+<meta property="og:type" content="article">
+<meta property="og:title" content="centos7,nmcli工具">
+<meta property="og:url" content="http://yoursite.com/2017/10/06/2017-08-22-nmcli/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:description" content="nmcli简介nmcli (NetworManager Client),是NetworkManager的程序的客户端,需要安装并启动服务进程.nmccli 工具集子命令,异常的多.好在centos7,支持子命令补全功能,需要安装bash-completion软件包,安装好后 su - 重新重新初始下工作环境就可以生效了">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://47.91.157.219/images/grub2.png">
+<meta property="og:image" content="http://47.91.157.219/images/team.png">
+<meta property="og:updated_time" content="2017-10-06T07:03:01.630Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="centos7,nmcli工具">
+<meta name="twitter:description" content="nmcli简介nmcli (NetworManager Client),是NetworkManager的程序的客户端,需要安装并启动服务进程.nmccli 工具集子命令,异常的多.好在centos7,支持子命令补全功能,需要安装bash-completion软件包,安装好后 su - 重新重新初始下工作环境就可以生效了">
+<meta name="twitter:image" content="http://47.91.157.219/images/grub2.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-08-22-nmcli" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-08-22-nmcli/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.630Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/网络管理/">网络管理</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      centos7,nmcli工具
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="nmcli简介"><a href="#nmcli简介" class="headerlink" title="nmcli简介"></a>nmcli简介</h2><p>nmcli (NetworManager Client),是NetworkManager的程序的客户端,需要安装并启动服务进程.<br>nmccli 工具集子命令,异常的多.好在centos7,支持子命令补全功能,需要安装<code>bash-completion</code><br>软件包,安装好后 <code>su -</code> 重新重新初始下工作环境就可以生效了</p>
+<a id="more"></a>
+<h3 id="centos7网卡命令方式"><a href="#centos7网卡命令方式" class="headerlink" title="centos7网卡命令方式"></a>centos7网卡命令方式</h3><p>centos6之前采用的是传统的网卡命名方式eth[#],当增加删除网卡的时候网卡名可能会随之改变.</p>
+<p>centos7采用systemd通过识别硬件和设备类型进行命名.</p>
+<h3 id="修改centos网卡名称"><a href="#修改centos网卡名称" class="headerlink" title="修改centos网卡名称"></a>修改centos网卡名称</h3><p>修改centos网卡命名方式为centos6之前的命名方式,要修改<code>/boot/grub2/grub.cfg</code>的文件,的内核启动选项,添加 <code>net.ifname=0</code> 如下图:</p>
+<p>不过官方不建议用户手动修改此文件,因为改错了,可能会导致grub程序出错导致系统无法启动,</p>
+<p>较为安全的做法是</p>
+<p>1.修改<code>/etc/default/grub</code> 中添加net.ifname=0 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GRUB_CMDLINE_LINUX=&quot;crashkernel=auto rd.lvm.lv=cl/root rd.lvm.lv=cl/swap rhgb quiet net.ifname=0&quot;</div></pre></td></tr></table></figure>
+<p><img src="http://47.91.157.219/images/grub2.png" alt="image"></p>
+<p>2.grub2-mkconfig -o /etc/grub2.cfg</p>
+<p>3.重启系统</p>
+<p>注意:此时重启系统后,用ifconfig 查看网卡名后变成了eth0,eth1  但是网卡配置文件的文件名,和网卡配置文件中的 <code>DEVICE=,  NAME=</code> 没有修改,需要编辑修改.</p>
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><pre><code>nmcli [ OPTIONS ] OBJECT { COMMAND | help }
+</code></pre><p>OBJECT 为对象常用的也就两个</p>
+<p><code>device</code>  类似ip link 的link,对接口进行操作,偏向物理层</p>
+<p><code>connect</code> 类似ip addr 的addr,对地址属性进行操作,偏向逻辑层</p>
+<h4 id="网络地址配置管理"><a href="#网络地址配置管理" class="headerlink" title="网络地址配置管理"></a>网络地址配置管理</h4><blockquote>
+<p>查看所有链接</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection [ show ]     #show不加也可以 connection 也可以简写为 con 或 c</div></pre></td></tr></table></figure>
+<blockquote>
+<p>查看特定接口的详细信息</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection show eth0     #显示内容非常详细</div></pre></td></tr></table></figure>
+<blockquote>
+<p>查看设备的状态</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli device show eth0</div></pre></td></tr></table></figure>
+<blockquote>
+<p>启动关闭重新加载某个接口</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection &#123;up|reload|down&#125; ens33</div></pre></td></tr></table></figure>
+<blockquote>
+<p>命令行修改网卡名称 modify</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection modify ens37 connection.id eth1</div></pre></td></tr></table></figure>
+<p>注意:此命令只是改配置文件中NAME= 的值及时生效</p>
+<blockquote>
+<p>添加网卡配置文件 add</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection add con-name home-eth1 type ethernet ifname eth1</div></pre></td></tr></table></figure>
+<p>注意:给网卡添加一个配置文件,不同场景下可以随机切花配置,此时会生成另一个配置文件,默认使用dhcp获取ip地址</p>
+<blockquote>
+<p>修改属性手动配置ip </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection modify home-eth1 ipv4.method manual ipv4.addresses 9.9.9.9/8 ipv4.gateway 9.9.9.1 ipv4.dns 114.114.114.114</div></pre></td></tr></table></figure>
+<blockquote>
+<p>modify 子命令和配置文件中的对应关系如下表</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>子命令</th>
+<th>配置文件字段</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> ipv4.method</td>
+<td>BOOTPROTO=none</td>
+</tr>
+<tr>
+<td> ipv4.method auto</td>
+<td>BOOTPROTO=dhcp</td>
+</tr>
+<tr>
+<td>ipv4.addresses</td>
+<td>IPADDR=,PREFIX=</td>
+</tr>
+<tr>
+<td>pv4.dns 8.8.8.8</td>
+<td>DNS0=8.8.8.8</td>
+</tr>
+<tr>
+<td>ipv4.dns-search</td>
+<td>example.com DOMAIN=example.com</td>
+</tr>
+<tr>
+<td>ipv4.ignore-auto-dns true</td>
+<td>PEERDNS=no</td>
+</tr>
+<tr>
+<td>connection.autoconnect yes</td>
+<td>ONBOOT=yes</td>
+</tr>
+<tr>
+<td>connection.id eth0</td>
+<td>NAME=eth0</td>
+</tr>
+<tr>
+<td>connection.interface-name</td>
+<td>eth0 </td>
+</tr>
+</tbody>
+</table>
+<h3 id="nmcli配置bond"><a href="#nmcli配置bond" class="headerlink" title="nmcli配置bond"></a>nmcli配置bond</h3><blockquote>
+<p>bonding机制</p>
+</blockquote>
+<p>就是将多块网卡绑定同一IP地址对外提供服务，可以实现高可用或者负载均衡。当然，直接给两块网卡设置同一IP地址是不可能的。通过bonding，虚拟块网卡对外提供连接，物理网卡的被修改为相同的MAC地址。</p>
+<blockquote>
+<p>bondding模式常用种类如下</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>MODE</th>
+<th>NAME</th>
+<th>Destination</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> 0</td>
+<td>balance-rr</td>
+<td>多个网卡同时工作,提供负载均衡和容错的能力</td>
+</tr>
+<tr>
+<td> 1</td>
+<td>active-backup</td>
+<td>主从模式,从的充当备胎角色,冗余的设计</td>
+</tr>
+<tr>
+<td> 3</td>
+<td>broadcast</td>
+<td>这种模式所有数据包都会接受两份,避免丢包</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>操作如下</p>
+</blockquote>
+<ol>
+<li>添加mybond0</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection add type bond con-name mybond0 ifname mybond0 modeactive-backup</div></pre></td></tr></table></figure>
+<ol>
+<li>修改mybond0网络设置</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection modify mybond0 ipv4.method manual ipv4.addresses172.18.5.70 ipv4.gateway 172.18.0.1 ipv4.dns 172.18.0.1</div></pre></td></tr></table></figure>
+<ol>
+<li>添加两个网卡到mybond0里</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">nmcli connection add type bond-slave master mybond0 ifname ech0</div><div class="line">nmcli connection add type bond-slave master mybond0 ifname ech1</div></pre></td></tr></table></figure>
+<p>4 .启动从属网卡</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">nmcli connection up bond-slave-eth0</div><div class="line">nmcli connection up bond-slave-eth1</div></pre></td></tr></table></figure>
+<ol>
+<li>可能需要重启服务</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">systemctl restart network</div></pre></td></tr></table></figure>
+<h3 id="nmcli配置team"><a href="#nmcli配置team" class="headerlink" title="nmcli配置team"></a>nmcli配置team</h3><p>team和bond原理一样,只是team采用的技术比较先进,<br>team不同于旧版中bonding技术，提供更好的性能和扩展性<br>team中提供的模式有</p>
+<p><code>broadcast</code><br><code>roundrobin</code><br><code>active-backup</code><br><code>loadbalance</code><br><code>lacp</code></p>
+<p>有一部分和bond是相同的bond是在 <code>mode</code> 关键词后指定 team是在 <code>config</code> 关键词后指定</p>
+<p>team的config后模式和bond相比有较大的不同,具体为JSON样式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&apos;&#123;&quot;runner&quot;: &#123;&quot;name&quot;: &quot;METHOD&quot;&#125;&#125;&apos;</div></pre></td></tr></table></figure>
+<p>注意:<code>runner</code> 和 <code>name</code> 为关键词不用改 METHOD 为想要指定的模式种类,<code>broadcase</code> <code>actibe-back</code> <code>roundrobin</code> 等</p>
+<p>1.添加网络组</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection add type team con-name team0 ifname team0 config &apos;&#123;&quot;runner&quot;:&#123;&quot;name&quot;:&quot;loadbalance&quot;&#125;&#125;&apos;</div></pre></td></tr></table></figure>
+<p>小技巧:这个命令比较复杂,如果没有明显的语法错误,系统不会报错,这个时候要<code>nmcli connection show</code> 查看所有的连接情况</p>
+<p>绿色的表示成功并且已经启用</p>
+<p>白色表示要么被down掉了,要么不生效</p>
+<p>黄色表示就绪状态,可以启用</p>
+<p><img src="http://47.91.157.219/images/team.png" alt="image"></p>
+<ol>
+<li>修改组的网络配置为静态IP</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection modify team0 ipv4.method manual ipv4.addresses 172.18.5.70 ipv4.gateway 172.18.0.1 ipv4.dns 172.18.0.1</div></pre></td></tr></table></figure>
+<ol>
+<li>加入物理网卡到team0组里</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">nmcli connection add type team-slave master team0 ifname eth0</div><div class="line">nmcli connection add type team-slave master team0 ifname eth1</div></pre></td></tr></table></figure>
+<ol>
+<li>启动</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">nmcli connection up team0</div><div class="line">nmcli connection up team-slave-eth0</div><div class="line">nmcli connection up team-slave-eth1</div></pre></td></tr></table></figure>
+<h3 id="nmcli配置bridge"><a href="#nmcli配置bridge" class="headerlink" title="nmcli配置bridge"></a>nmcli配置bridge</h3><p>多网卡桥接功能,不提供冗余和负载均衡的能力,主要用于虚拟化中,功能也是将多个网卡绑定到一个IP地址中.</p>
+<p>添加桥接br0        </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection add type bridge con-name br0 ifname br0</div></pre></td></tr></table></figure>
+<p>添加属于br0接口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">nmcli connection add type bridge-slave master br0 ifname eth0</div><div class="line">nmcli connection add type bridge-slave master br0 ifname eth1</div></pre></td></tr></table></figure>
+<p>修改br0地址为静态地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nmcli connection modify br0 ipv4.method manual ipv4.addresses 172.18.5.70/16 ipv4.gateway 172.18.0.1 ipv4.dns 172.18.0.1</div></pre></td></tr></table></figure>
+<p>启动br0</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">nmcli connection up br0</div><div class="line">nmcli connection up bridge-slave-eth0</div><div class="line">nmcli connection up bridge-slave-eth1</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-08-22-nmcli/" data-id="cj8fk3euv000igx7x03aksb6v" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nmcli/">nmcli</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2017/10/06/2017-07-31-find/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          find命令使用总结
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/10/06/2017-07-25-acl/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">linux acl访问控制</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#nmcli简介"><span class="toc-number">1.</span> <span class="toc-text">nmcli简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#centos7网卡命令方式"><span class="toc-number">1.1.</span> <span class="toc-text">centos7网卡命令方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改centos网卡名称"><span class="toc-number">1.2.</span> <span class="toc-text">修改centos网卡名称</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#语法"><span class="toc-number">1.2.1.</span> <span class="toc-text">语法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#网络地址配置管理"><span class="toc-number">1.2.2.</span> <span class="toc-text">网络地址配置管理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nmcli配置bond"><span class="toc-number">1.3.</span> <span class="toc-text">nmcli配置bond</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nmcli配置team"><span class="toc-number">1.4.</span> <span class="toc-text">nmcli配置team</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nmcli配置bridge"><span class="toc-number">1.5.</span> <span class="toc-text">nmcli配置bridge</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

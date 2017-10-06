@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>awk基本用法 | zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="awk是一种模式扫描和处理语言，在对数据进行分析处理时，是十分强大的工具。">
+<meta name="keywords" content="awk">
+<meta property="og:type" content="article">
+<meta property="og:title" content="awk基本用法">
+<meta property="og:url" content="http://yoursite.com/2017/10/06/2017-09-06-awk/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:description" content="awk是一种模式扫描和处理语言，在对数据进行分析处理时，是十分强大的工具。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-10-06T07:03:01.630Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="awk基本用法">
+<meta name="twitter:description" content="awk是一种模式扫描和处理语言，在对数据进行分析处理时，是十分强大的工具。">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-06-awk" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-09-06-awk/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.630Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux基础/">linux基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      awk基本用法
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h3 id="awk-工作模式"><a href="#awk-工作模式" class="headerlink" title="awk 工作模式"></a>awk 工作模式</h3><p><code>awk</code>的工作过程是这样的：按行读取输入(标准输入或文件)，对于符合模式<code>pattern</code>的行，执行<code>action</code>。当<code>pattern</code>省略时表示匹配任何字符串；当<code>action</code>省略时表示执行<code>&#39;{print}&#39;</code>；它们不可以同时省略。每一行输入，对<code>awk</code>来说都是一条记录(<code>record</code>)，<code>awk</code>使用<code>$0</code>来引用当前记录</p>
+<a id="more"></a>
+<blockquote>
+<p>语法</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">awk [options] 'program'' file…</div><div class="line">awk [options] -f programfile var=value file…</div><div class="line">awk [options] 'BEGIN&#123; action;… &#125; pattern&#123; action;… &#125; END&#123;action;… &#125;' file ...</div></pre></td></tr></table></figure>
+<h3 id="常用选项"><a href="#常用选项" class="headerlink" title="常用选项"></a>常用选项</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">选项</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">-F  field separator</td>
+<td style="text-align:left">指定字段分割符</td>
+</tr>
+<tr>
+<td style="text-align:left">-v var=value</td>
+<td style="text-align:left">赋值变量</td>
+</tr>
+</tbody>
+</table>
+<h3 id="内建变量"><a href="#内建变量" class="headerlink" title="内建变量"></a>内建变量</h3><table>
+<thead>
+<tr>
+<th>内建变量</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FS (field separator)</td>
+<td>输入字段分隔符(默认为空白)</td>
+</tr>
+<tr>
+<td>RS (record separator)</td>
+<td>输入记录分隔符(默认为换行)</td>
+</tr>
+<tr>
+<td>OFS (output field separator)</td>
+<td>输出字段分隔符(默认为空白)</td>
+</tr>
+<tr>
+<td>ORS (output record sparator)</td>
+<td>输出字段分割符</td>
+</tr>
+<tr>
+<td>NF (number field)</td>
+<td>字段数量</td>
+</tr>
+<tr>
+<td>NR (number row)</td>
+<td>行号(已经处理过的) 后面可跟多个文件</td>
+</tr>
+<tr>
+<td>FNR (file number row)</td>
+<td>行号(当前处理文件的) 后面可跟多个文件</td>
+</tr>
+<tr>
+<td>ARGV (args value)</td>
+<td>命令行参数的数组</td>
+</tr>
+<tr>
+<td>ARGC(args count)</td>
+<td>命令行参数(后跟的文件) 个数</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>例如 </p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root: ~]# awk 'BEGIN &#123;print ARGC,ARGV[0],ARGV[2]&#125;' /etc/fstab /etc/passwd</div><div class="line">3 awk /etc/passwd</div></pre></td></tr></table></figure>
+<p>注意: 输入参数只有两个,但是显示3个,因为awk本身的命令也算一个 <code>ARGV[0]</code> 表示命令自身 <code>ARGV[2]</code>表示第二个</p>
+<h3 id="格式化打印"><a href="#格式化打印" class="headerlink" title="格式化打印"></a>格式化打印</h3><blockquote>
+<p>语法</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">printf "FORMAT", item1, item2, ...</div></pre></td></tr></table></figure>
+<ul>
+<li>必须要写FORMAT</li>
+<li>不会自动换行,要手动加”\n”</li>
+<li>FORMAT中需要分别为后面每个item指定格式符</li>
+</ul>
+<blockquote>
+<p>格式符</p>
+</blockquote>
+<p>格式符:必须与 item 一一对应</p>
+<table>
+<thead>
+<tr>
+<th>个数符</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%c</td>
+<td>见一个数最ASCII字符显示</td>
+</tr>
+<tr>
+<td>%d,%i</td>
+<td>显示一个整数 %i 是十进制的</td>
+</tr>
+<tr>
+<td>%e.%E</td>
+<td>科学记数法显示</td>
+</tr>
+<tr>
+<td>%f</td>
+<td>显示为浮点数</td>
+</tr>
+<tr>
+<td>%g,%G</td>
+<td>以科学计数法或浮点形式显示数值</td>
+</tr>
+<tr>
+<td>%s</td>
+<td>显示字符串</td>
+</tr>
+<tr>
+<td>%u</td>
+<td>无符号整数</td>
+</tr>
+<tr>
+<td>%%</td>
+<td>显示%自身</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>修饰符</p>
+</blockquote>
+<p>控制显示的位宽,左对齐右对齐等等</p>
+<table>
+<thead>
+<tr>
+<th>修饰符</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#[.#]</td>
+<td>前面#表示位宽,后面表示输出的浮点型数字小数点后面的长度</td>
+</tr>
+<tr>
+<td>-</td>
+<td>左对齐,不写默认为右对其</td>
+</tr>
+<tr>
+<td>+</td>
+<td>显示数字的正负符号</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>例子</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[root: ~]# awk -F : 'BEGIN&#123;printf "%-10s%-10s%-10s\n","username","uid","shell"&#125;'\</div><div class="line">'&#123;printf "%-10s%-10d%-10s\n",$1,$3,$NF&#125;' /etc/passwd</div><div class="line">username  uid       shell     </div><div class="line">root      0         /bin/bash </div><div class="line">bin       1         /sbin/nologin</div><div class="line">daemon    2         /sbin/nologin</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>注意: ‘BEGIN{action}’’{action}’ ,中间不能有空格,fomat格式化后面的字段,如果变量不加引号,字符串要加引号</p>
+<h3 id="操作符"><a href="#操作符" class="headerlink" title="操作符"></a>操作符</h3><p>awk程序支持多种匹配模式来过滤数据记录,类似sed地址定界</p>
+<blockquote>
+<p>算术操作符</p>
+</blockquote>
+<p>跟其他变成语言类似注意次方的使用和bash的区别 <code>x^y</code> <code>x%y</code> </p>
+<p>小技巧</p>
+<p><code>+x</code> : 可以将某个字段转换成数字</p>
+<p><code>-x</code> :转换成负数</p>
+<blockquote>
+<p>例如监控磁盘的使用率</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# df | awk '&#123;if(+$5&gt;=10)printf"%-20s will full,used %-3s\n",$1,$5&#125;'</div><div class="line">/dev/mapper/cl-root  will full,used 22%</div><div class="line">/dev/sda1            will full,used 14%</div><div class="line">/dev/sdb1            will full,used 20%</div></pre></td></tr></table></figure>
+<p><code>$5</code> 一列有个%号 使用 <code>+$5</code> 可以去掉%做数学运算,超过10%,报警</p>
+<blockquote>
+<p>赋值操作符</p>
+</blockquote>
+<p>都是如下表示方式 <code>++</code> <code>+=</code> 等</p>
+<blockquote>
+<p>模式匹配</p>
+</blockquote>
+<p>和bash scripts类似使用 <code>~</code> <code>!~</code> ,判断左边是否和右边匹配</p>
+<blockquote>
+<p>匹配行范围</p>
+</blockquote>
+<p>格式 : /part1/,/part2/  表示处理匹配/part1/ 到/part2/ 的之间所有行</p>
+<p>注意:awk中不支持  3,8 这中行号的写法,真确的写法应该是 (NR&gt;=3&amp;&amp;NR&lt;=8)</p>
+<blockquote>
+<p>例子</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# cat -n /etc/passwd | awk -F : '(NR&gt;=3&amp;&amp;NR&lt;=4)&#123;print $1,$3&#125;'</div><div class="line">     3	daemon 2</div><div class="line">     4	adm 3</div></pre></td></tr></table></figure>
+<h3 id="流程控制语句"><a href="#流程控制语句" class="headerlink" title="流程控制语句"></a>流程控制语句</h3><h4 id="判断语句"><a href="#判断语句" class="headerlink" title="判断语句"></a>判断语句</h4><p>if 单分支: if (condition)  {statment1;stament2;…}</p>
+<p>注意:如果只有一条命令,可以不用加花括号,否侧一定要加,且用分号隔开</p>
+<p>多分支语法: if (condition) statement1;else statement2</p>
+<blockquote>
+<p>例如</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# netstat -antu | awk '&#123;if($6=="LISTEN")&#123;x++&#125;else&#123;y++&#125;&#125;END&#123;print x,y&#125;'</div><div class="line">5 9</div></pre></td></tr></table></figure>
+<p>表示: 处理每行的<code>$6</code> 如果为LISTEN 就执行x++, 执行完后执行END后的统计</p>
+<p> 条件表达式(三目表达式) selector?if-true-expression1:if-false-expression2 </p>
+<p>表示:selector 是否匹配,匹配的话继续匹配expression1否则继续匹配-expression2</p>
+<blockquote>
+<p>1 例如</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root: ~]# awk -F: '$3&gt;500?/\/bin\/bash$/:$3==0 &#123;print $0&#125;' /etc/passwd</div><div class="line">root:x:0:0:zhangxingshi,(0516)-5666123,18567087793,12344441113:/root:/bin/bash</div><div class="line">zxs:x:501:501::/home/zxs:/bin/bash</div><div class="line">zxs1:x:502:502::/home/zxs1:/bin/bash</div></pre></td></tr></table></figure>
+<p>注意:/part/  part中的字符串有<code>/</code> 要转义</p>
+<blockquote>
+<p>例如</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root: ~]# awk -F: '&#123;$3&gt;499?usertype="common user":usertype="sysuser";printf "%10s:%-10s\n",$1,usertype&#125;' /etc/passwd</div><div class="line">      root:sysuser   </div><div class="line">       bin:sysuser   </div><div class="line">    daemon:sysuser   </div><div class="line">    ...</div></pre></td></tr></table></figure>
+<h4 id="循环语句"><a href="#循环语句" class="headerlink" title="循环语句"></a>循环语句</h4><blockquote>
+<p>语法</p>
+</blockquote>
+<p>1 while循环: while(condition){statement;…}</p>
+<blockquote>
+<p>例子</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# awk '/^[[:space:]]*linux16/&#123;i=1;while(i&lt;=NF)&#123;print $i,length($i);i++&#125;&#125;'/etc/grub2.cfg</div></pre></td></tr></table></figure>
+<p>表示: 查找 /etc/grub2.cfg 文件中匹配以空格后跟linux16的行,并统计每个字段的长度 <code>length()</code> 内建函数</p>
+<p>2 for循环</p>
+<p>语法 :  表达式一 :  for(expr1;expr2;expr3) {statement;…}   和c语言类似的语法</p>
+<blockquote>
+<p>例如 : 打印斐波那契数列</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">[root: ~]# cat fibonacci.awk </div><div class="line"><span class="meta">#</span>!/bin/awk -f</div><div class="line">BEGIN&#123;</div><div class="line">    $1=1</div><div class="line">    $2=1</div><div class="line">    OFS=","</div><div class="line">    for(i=3;i&lt;=10;i++)</div><div class="line">    &#123;</div><div class="line">        $i=$(i-2)+$(i-1)</div><div class="line">    &#125;</div><div class="line">    print</div><div class="line">&#125;</div><div class="line">[root: ~]# ./fibonacci.awk </div><div class="line">1,1,2,3,5,8,13,21,34,55</div></pre></td></tr></table></figure>
+<p>​        表达式二:  for(var in array) {for-body}   用于遍历数组: </p>
+<h4 id="循环控制"><a href="#循环控制" class="headerlink" title="循环控制"></a>循环控制</h4><p>awk本身就是循环遍历,文件的每一行,然后进行处理. awk里的循环,一般循环的是字段</p>
+<p>break 和 contine</p>
+<p>例子: 计算100 奇数的和</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# awk 'BEGIN&#123;sum=0;for(i=1;i&lt;=100;i++)&#123;if(i%2==0)continue;sum+=i&#125;print sum&#125;'</div><div class="line">2500</div></pre></td></tr></table></figure>
+<p>next  : 表示提前结束本行的处理,对下一行进行循环. 看着和contine 差不多,但是next 跳过的是awk 自身对行的循环,而不是内部字段的循环</p>
+<p>例如 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# awk -F : '&#123;if($3%2==0)next;print $1,$3&#125;' /etc/passwd</div><div class="line">bin 1</div><div class="line">adm 3</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>分析: <code>$3</code> 为uid 的字段,表示uid为偶数就 <code>next</code> 处理下一行, 结果为打印uid为奇数行的 1 3 字段 </p>
+<h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><p>awk中的数组格式和bash中的关联数组类似,下标通常引用字段的名称,用于统计</p>
+<ul>
+<li>可使用任意字符串；字符串要使用双引号括起来</li>
+<li>如果某数组元素事先不存在，在引用时，awk会自动创建此元素，并将其值初始化为“空串”</li>
+<li>若要判断数组中是否存在某元素，要使用“var in array”格式进行遍历</li>
+</ul>
+<blockquote>
+<p>例子1</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[root: ~]# awk -F : '&#123;shell[$NF]++&#125;END&#123;for(i in shell)print i,shell[i]&#125;' /etc/passwd</div><div class="line">/sbin/shutdown 1</div><div class="line">/bin/bash 17</div><div class="line">/sbin/nologin 22</div><div class="line">/sbin/halt 1</div><div class="line">/bin/sync 1</div></pre></td></tr></table></figure>
+<p>分析 :<code>shell</code> 是初始化的数组 <code>shell[$NF]++</code> 表示式中 <code>$NF</code>式文件中的shell类型,不同的shell 类型不同,数组的下标就不同,相同的下标值就会累加,最后统计</p>
+<blockquote>
+<p>例子 2</p>
+</blockquote>
+<p>要求统计测试文件test.txt 中分别男生和女生考试成绩的总成绩 和平均值</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">[root: ~]# cat test.txt </div><div class="line">mage 97 male</div><div class="line">wang 90 male</div><div class="line">zhang 80 female</div><div class="line">li  87 female</div><div class="line">[root: ~]# awk '&#123;sum[$3]+=$2;num[$3]++&#125;END&#123;for (i in sum) print i,sum[i],sum[i]/num[i] &#125;' test.txt </div><div class="line">female 167 83.5</div><div class="line">male 187 93.5</div></pre></td></tr></table></figure>
+<p>分析: 本题初始两个数组 <code>sum</code> 和  <code>num</code> 下标都为 <code>$3</code> ,(就 male 和 female 两种) ,<code>sum[$3]</code>  累加 <code>$2</code> 表示同一个下标的总成绩, <code>num[$3]</code> 累加1 表示同一个下标出现的此时, 引用数组必须要用 <code>for (var in array)</code> 的形式, var 表示数组的下标 .</p>
+<p>当然,如果统计某个字段的总类较多,适合用数组的表示方法. 本例中<code>$3</code> 字段中有两中,用 <code>if</code> 比较简单明了</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root: ~]# awk '&#123;if($3 == "male")&#123;msum+=$2;mnum++&#125;else&#123;fsum+=$2;fnum++&#125;&#125;END&#123;printf "male: %5-d%.1f\n",msum,msum/mnum;printf "female: %5-d%.1f\n",fsum,fsum/fnum&#125;' test.txt </div><div class="line">male: 187  93.5</div><div class="line">female: 167  83.5</div></pre></td></tr></table></figure>
+<p>分析: 逻辑简单,需要四个变量,需要打印两次 ,所以需要 printf 换行,写法较乱</p>
+<h3 id="内建函数"><a href="#内建函数" class="headerlink" title="内建函数"></a>内建函数</h3><h4 id="rand"><a href="#rand" class="headerlink" title="rand()"></a>rand()</h4><p>rand()：返回0和1之间一个随机数,不能直接调用 rand(),输出的值相同,需要使用srand(),并且通过运算获得想要的值的范围</p>
+<blockquote>
+<p>例如: 获取10个100以内的随机整数</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root: ~]# awk 'BEGIN&#123;srand();for(i=1;i&lt;=10;i++)print int(rand()*100)&#125;'</div></pre></td></tr></table></figure>
+<h4 id="length"><a href="#length" class="headerlink" title="length()"></a>length()</h4><p>返回指定字符串的长度</p>
+<h4 id="sub"><a href="#sub" class="headerlink" title="sub()"></a>sub()</h4><p>sub函数的参数格式为 <code>sub(r,s,[t])</code> 表示:对t字符串进行搜索r表示的模式匹配的内容，并将第一个匹配的内容替换为s</p>
+<blockquote>
+<p>例子</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root: ~]# date +"%F %T"</div><div class="line">2017-09-04 10:04:25</div><div class="line">[root: ~]# date +"%F %T" | awk 'sub(/:/,"-",$2)'</div><div class="line">2017-09-04 10-05:12</div></pre></td></tr></table></figure>
+<p>注意 : <code>sub()</code>  默认值替换第一个匹配到的字符,全部替换要用 <code>gsub()</code></p>
+<h4 id="split"><a href="#split" class="headerlink" title="split()"></a>split()</h4><p>参数格式为<code>split(s,array,[r])</code> 以r为分隔符，切割字符串s，并将切割后的结果保存至array所表示的数组中，第一个索引值为1,第二个索引值为2,…</p>
+<blockquote>
+<p>例如</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# head -20 &lt;(awk  '&#123;print $5&#125;' f1.log) </div><div class="line">and</div><div class="line">Address</div><div class="line">172.18.5.67:38848</div><div class="line">172.18.5.67:38854</div><div class="line">172.18.5.67:38850</div></pre></td></tr></table></figure>
+<p>如上文件<code>f1.log</code> 第5个字段是 ip:socket 的方式,要想在将 <code>$5</code> 切片成只剩ip 然后统计相同ip出现的次数 可以使用 <code>split()</code> </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# awk  'NR&gt;2&#123;split($5,socket,":");ip[socket[1]]++&#125;END&#123;for (i in ip)print i,ip[i]&#125;' f1.log </div><div class="line"> 3</div><div class="line">0.0.0.0 2</div><div class="line">172.18.253.34 2</div><div class="line">172.18.5.67 4105</div></pre></td></tr></table></figure>
+<p>分析 :<code>split()</code>  切片 <code>$5</code> 后保存在数组 <code>socket</code>  里 <code>socket[1]</code> 保存的是ip地址 ,然后再以 <code>socket[1]</code> 为下标</p>
+<p>累加 <code>ip[socket[1]]++</code> ,取出 ip  数组的值和对应的下标就统计出来了</p>
+<h3 id="小技巧"><a href="#小技巧" class="headerlink" title="小技巧"></a>小技巧</h3><p>在模式匹配中一般,关系表达是为真,才会处理,一般表示为,</p>
+<blockquote>
+<p>例如</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[root: archive]# awk '!/^UUID/&#123;print $0&#125;' /etc/fstab</div><div class="line">[root: archive]# awk '!/^UUID/&#123;print&#125;' /etc/fstab</div><div class="line">[root: archive]# awk '!/^UUID/' /etc/fstab</div></pre></td></tr></table></figure>
+<p>注意 : 以上三种表示方法的输出结果都一样, prinf 不加参数默认打印 <code>$0</code> ;{action} 不写默认动作为</p>
+<p>{print $0} .</p>
+<blockquote>
+<p>还可以有一些奇葩方式</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root: archive]# seq 10 | awk 'i=!i'     #打印奇数行</div></pre></td></tr></table></figure>
+<p>分析 :awk默认初始所有变量为 空或者0, (0表示假,表不不执行默认动作{print $0}) </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">[root: archive]# (seq 10;seq 10) | awk '!line[$0]++'</div></pre></td></tr></table></figure>
+<p>分析: awk读取每行文件 ,<code>line[$0]</code> 初始值为0(即为假) <code>!line[$0]++</code>, <code>$0</code> 表示整行, 只要行不同,就是数组中的一个新的元素,初始值为 0 ,如果出现相同的行 <code>!line[$0]</code> 有值了即为假 ,不打印重复的行</p>
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习:"></a>练习:</h3><blockquote>
+<p> 统计/etc/init.d/functions 文件下的单词数</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">[root: ~]# cat word_count.awk </div><div class="line"><span class="meta">#</span>!/bin/awk -f</div><div class="line">BEGIN&#123;</div><div class="line">	FS="[^a-zA-Z]+"</div><div class="line">	printf "%-15s:%-5s\n---------------------\n","Word","Count"</div><div class="line">&#125;</div><div class="line">&#123;for(i=1;i&lt;=NF;i++)</div><div class="line">	&#123;if( $i ~ /./ )</div><div class="line">		&#123;word[$i]++</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line">END&#123;for(j in word)</div><div class="line">		&#123;printf "%-15s:%-5s\n",j,word[j]</div><div class="line">		&#125;</div><div class="line">&#125;</div><div class="line">[root: ~]# ./word_count.awk /etc/init.d/functions </div><div class="line">Word           :Count</div><div class="line">---------------------</div><div class="line">otherwise      :1    </div><div class="line">pidfileofproc  :2    </div><div class="line">...</div></pre></td></tr></table></figure>
+<blockquote>
+<p>提取出字符串Yd$C@M05MB%9&amp;Bdh7dq+YVixp3vpw中的所有数字</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root: ~]# echo "Yd$C@M05MB%9&amp;Bdh7dq+YVixp3vpw" | awk -F "" \</div><div class="line"><span class="meta">&gt;</span> '&#123; for (i=1;i&lt;+NF;i++)\</div><div class="line"><span class="meta">&gt;</span>      &#123; if ($i ~ /[0-9]/) printf $i&#125;\</div><div class="line"><span class="meta">&gt;</span> '&#125;</div></pre></td></tr></table></figure>
+<p>注意: -F “” 表示以空为分隔符.表示每个字符算一个,字段</p>
+<blockquote>
+<p>合并相同列的两个文件</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# cat f2.txt </div><div class="line">Number  score</div><div class="line">01      97</div><div class="line">02      56</div><div class="line">03      77</div><div class="line">&lt;root: ~&gt;# cat f1.txt </div><div class="line">Name  Number  Gendar</div><div class="line">zhang    01       M</div><div class="line">li       02       F</div><div class="line">wang     03       M</div><div class="line">&lt;root: ~&gt;# awk 'NR==FNR&#123;score[$1]=$2;next&#125;&#123;printf "%30-s%10-s\n",$0,score[$2]&#125;' f2.txt f1.txt </div><div class="line">Name  Number  Gendar          score     </div><div class="line">zhang    01       M           97        </div><div class="line">li       02       F           56        </div><div class="line">wang     03       M           77</div></pre></td></tr></table></figure>
+<p>分析: 两个文件共同列是,<code>f2.txt</code> 中的 <code>$1</code> 和 <code>f1.txt</code> 中的 <code>$2</code> , 由于awk 处理两个文件 ,<code>NR==FNR</code> 表示的是第一个文件, 目的是将第一个文件的不同列合并到第二个文件里, 处理第一个文件是,不输出信息而是将 <code>$1</code> 当作下标 <code>$2</code> 当作值存储在 数组 score中, 处理到第二个文件时 直接打印 <code>$0</code> 和数组的值,注意下标为 这个文件的<code>$2</code>   </p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-09-06-awk/" data-id="cj8fk3evg000wgx7x6m12hzkt" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/awk/">awk</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2017/10/06/2017-09-03-selinux/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          sellinux简单介绍
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/10/06/2017-08-12-disk/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">磁盘管理</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#awk-工作模式"><span class="toc-number">1.</span> <span class="toc-text">awk 工作模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#常用选项"><span class="toc-number">2.</span> <span class="toc-text">常用选项</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内建变量"><span class="toc-number">3.</span> <span class="toc-text">内建变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#格式化打印"><span class="toc-number">4.</span> <span class="toc-text">格式化打印</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#操作符"><span class="toc-number">5.</span> <span class="toc-text">操作符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#流程控制语句"><span class="toc-number">6.</span> <span class="toc-text">流程控制语句</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#判断语句"><span class="toc-number">6.1.</span> <span class="toc-text">判断语句</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#循环语句"><span class="toc-number">6.2.</span> <span class="toc-text">循环语句</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#循环控制"><span class="toc-number">6.3.</span> <span class="toc-text">循环控制</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数组"><span class="toc-number">7.</span> <span class="toc-text">数组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内建函数"><span class="toc-number">8.</span> <span class="toc-text">内建函数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#rand"><span class="toc-number">8.1.</span> <span class="toc-text">rand()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#length"><span class="toc-number">8.2.</span> <span class="toc-text">length()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sub"><span class="toc-number">8.3.</span> <span class="toc-text">sub()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#split"><span class="toc-number">8.4.</span> <span class="toc-text">split()</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#小技巧"><span class="toc-number">9.</span> <span class="toc-text">小技巧</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#练习"><span class="toc-number">10.</span> <span class="toc-text">练习:</span></a></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

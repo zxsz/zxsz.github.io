@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>linux acl访问控制 | zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="linxu系统上，简单理解文件和目录的存储方式，从根本上理解软连接和硬链接">
+<meta name="keywords" content="setfacl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux acl访问控制">
+<meta property="og:url" content="http://yoursite.com/2017/10/06/2017-07-25-acl/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:description" content="linxu系统上，简单理解文件和目录的存储方式，从根本上理解软连接和硬链接">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-10-06T07:03:01.630Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="linux acl访问控制">
+<meta name="twitter:description" content="linxu系统上，简单理解文件和目录的存储方式，从根本上理解软连接和硬链接">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-07-25-acl" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-07-25-acl/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.630Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux基础/">linux基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      linux acl访问控制
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="acl访问控制列表的作用"><a href="#acl访问控制列表的作用" class="headerlink" title="acl访问控制列表的作用"></a>acl访问控制列表的作用</h2><p>linxu传统权限，只有owner，group，other 三类，如果对某一个用户，要设定特殊的权限，但又不想改变原有的传统权限位，这时候就要用到ACL</p>
+<a id="more"></a>
+<h3 id="如何设定ACL权限"><a href="#如何设定ACL权限" class="headerlink" title="如何设定ACL权限"></a>如何设定ACL权限</h3><blockquote>
+<p>查看文件或目录的facl权限的命令为<code>getfacl</code> ，比较下传统权限和acl</p>
+</blockquote>
+<pre><code>[root: app]# ll fstab 
+-rw-r--r-- 1 root root 4 Jul 24 13:50 fstab
+[root: app]# getfacl fstab     # 现在没有设定acl权限，显示的是默认值
+# file: fstab
+# owner: root
+# group: root
+user::rw-            #属主的默认权限
+group::r--            #属组的默认权限
+other::r--            #其他用户的默认权限
+</code></pre><blockquote>
+<p>设定某个特定用户，对该文件有特殊权限</p>
+</blockquote>
+<p><em>上面所示文件 fstab 权限只对root用户有可写权限，设定用户 gentoo 对该文件有写权限</em></p>
+<pre><code>[root: app]# setfacl -m u:gentoo:rw fstab    #设定acl权限
+[root: app]# getfacl fstab                     
+# file: fstab                            
+# owner: root        
+# group: root            
+user::rw-            
+user:gentoo:rw-        #这是自定义的用户对该文件的权限
+group::r--            
+mask::rw-            #设定acl后多出来这个，稍后解释
+other::r--
+</code></pre><p>切换 gentoo 测试是否有写权限</p>
+<pre><code>[gentoo@localhost app]$ echo abc &gt; fstab 
+</code></pre><blockquote>
+<p>添加某个特定组，对该文件的权限</p>
+</blockquote>
+<pre><code>[root: app]# groupadd admins
+[root: app]# useradd -g admins centos
+[root: app]# setfacl -m g:admins:- fstab   #设定admins 组中用户对该文件没有任何权限
+</code></pre><p>测试</p>
+<pre><code>[centos@localhost ~]$ cat /app/fstab 
+cat: /app/fstab: Permission denied   
+</code></pre><p><em>admins组中用户对该文件，没有任何权限，但其他用户有可读权限</em></p>
+<p><strong>ACL访问控制列的权限的顺序就是按照列表从上到下匹配</strong></p>
+<p>1 判断用户是否为文件的ower，是就应用默认ower的权限，不会用到acl的自定义列表，不是ower进入第2步</p>
+<p>2 不是ower，查看有没有自定义对该用户的权限，否则进入第3步</p>
+<p>3 查看group是否问文件的group，是的话应用默认group权限，否则进入第4步</p>
+<p>4 查看group中是否有文件中自定义对该group的特殊权限，有就应用特殊权限，否则进入第5步</p>
+<p>5 应用other权限</p>
+<p><strong>ACL可以控制5种用户的权限分别为：</strong></p>
+<ul>
+<li><p>ower</p>
+</li>
+<li><p>自定义users</p>
+</li>
+<li><p>group</p>
+</li>
+<li><p>自定义group</p>
+</li>
+<li><p>other    </p>
+</li>
+</ul>
+<blockquote>
+<p>修改文件默认other 和 group的权限</p>
+</blockquote>
+<pre><code>setfacl -m u::[rwx] fstab    
+setfacl -m u::[rwx] fstab
+</code></pre><blockquote>
+<p>清除ACL权限的命令为</p>
+</blockquote>
+<pre><code>setfacl -x u:gentoo  fstab        #后面不用跟权限位
+setfacl -x g:admins  fstab
+</code></pre><blockquote>
+<p>mask的作用</p>
+</blockquote>
+<p><em>限定除ower和other之外的最高权限，实际权限后面有注释#effective:r–   看例子:</em></p>
+<pre><code>[root: app]# setfacl -m mask::r  fstab      #设定mask
+[root: app]# getfacl fstab         
+# file: fstab
+# owner: root
+# group: root
+user::rw-                                             # 默认权限
+user:gentoo:rw-            #effective:r--     &lt;-- #这个是系统自己注释的，表示实际权限
+group::r--
+group:admins:---          
+mask::r--
+other::r--
+[root: app]# ll fstab 
+-rw-r--r--+ 1 root root 4 Jul 24 14:42 fstab
+</code></pre><p>注意：设定mask权限后，ACL表中 group的默认权限为rw  ，而ls-l命令查看的权限为r  ，因为一旦应用了acl权限后，传统查看权限的命令，显示的是mask位表示的权限，实际应用的是 #effective: 标注的权限</p>
+<p>对该文件重新执行setfacl，命令后会使mask的值发生变化，所以调整mask值属于临时性的 </p>
+<blockquote>
+<p>清除和备份acl的权限和 对目录设定默认acl，递归所有文件acl</p>
+</blockquote>
+<pre><code>[root: app]# tree
+.
+├── dir1
+│   ├── dir2
+│   │   └── f2
+│   └── f1
+├── fstab
+└── lost+found
+</code></pre><p>事先创建如上目录结构</p>
+<pre><code>[root: app]# setfacl -m d:g:admins:rw dir1    创建dir1 的默认acl，这个只能对目录创建
+[root: app]# getfacl dir1/f1        #对已经存在的文件不生效
+ file: dir1/f1
+# owner: root
+# group: root
+user::rw-
+group::r--
+other::r--
+</code></pre><p>查看下新创建的文件和目录是否继承对 dir1 设定的权限</p>
+<pre><code>目录
+[root: app]# mkdir dir1/dir3               #dir1下创建的目录
+[root: app]# getfacl dir1/dir3
+# file: dir1/dir3
+# owner: root
+# group: root
+user::rwx
+group::r-x
+group:admins:rw-
+mask::rwx
+other::r-x
+default:user::rwx
+default:group::r-x                        #继承了dir1 设定的默认权限
+default:group:admins:rw-
+default:mask::rwx
+default:other::r-x
+
+文件
+[root: app]# touch dir1/dir3/f3
+[root: app]# getfacl dir1/dir3/f3
+# file: dir1/dir3/f3
+# owner: root
+# group: root
+user::rw-
+group::r-x            #effective:r--
+group:admins:rw-
+mask::rw-
+other::r--
+</code></pre><p>要想对现有的所有文件和目录递归设置facl权限 使用-R选项</p>
+<pre><code>[root: app]# setfacl -Rm g:admins:--X dir1    #使用大写X，看看有什么不同
+
+文件
+[root: app]# getfacl dir1/f1             对文件没有设置x权限，应为文件有x权限很危险 
+# file: dir1/f1
+# owner: root
+# group: root
+user::rw-
+group::r--
+group:admins:---
+mask::r--
+other::r--
+
+目录
+[root: app]# getfacl dir1/dir2
+# file: dir1/dir2
+# owner: root
+# group: root
+user::rwx
+group::r-x
+group:admins:--x              对目录却又x权限，x对目录是基本权限  所有X选项在递归的情况下有用
+mask::r-x
+other::r-x
+</code></pre><p>清理目录下所有的权限为</p>
+<pre><code>[root: app]# setfacl -b dir1
+</code></pre><p>删除目录的默认权限为，</p>
+<pre><code>[root: app]# setfacl -k dir1
+</code></pre><blockquote>
+<p>备份acl列表和从列表中恢复acl</p>
+</blockquote>
+<pre><code>[root: app]# getfacl fstab &gt; fstab.acl              备份到 fstab.acl
+[root: app]# setfacl -M fstab.acl dir1/f1           恢复 fstab.acl 到 f1
+</code></pre><p>注意：利用tar打包工具，或者不加参数的 cp命令，不会保留文件的acl权限，要想保留文件acl权限，此时需要备份acl列表</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-07-25-acl/" data-id="cj8fk3etg0001gx7x8bp3izvn" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/setfacl/">setfacl</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2017/10/06/2017-08-22-nmcli/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          centos7,nmcli工具
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/10/06/2017-09-03-selinux/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">sellinux简单介绍</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#acl访问控制列表的作用"><span class="toc-number">1.</span> <span class="toc-text">acl访问控制列表的作用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#如何设定ACL权限"><span class="toc-number">1.1.</span> <span class="toc-text">如何设定ACL权限</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

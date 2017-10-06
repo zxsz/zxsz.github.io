@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>ssh隧道技术 | zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="ssh隧道ssh通常用于加密的远程登陆,其他ssh功能非常强大,其中一个就是端口转发,也叫 隧道 tunnel , 能封装一些没有加密功能的tcp协议 telnet ,smtp 等  让这些不安全的协议的数据包由ssh 加密后安全传输, 而且能通过跳板机穿透防火墙的限制等.">
+<meta name="keywords" content="端口转发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ssh隧道技术">
+<meta property="og:url" content="http://yoursite.com/2017/10/06/2017-09-14-ssh_tunnel/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:description" content="ssh隧道ssh通常用于加密的远程登陆,其他ssh功能非常强大,其中一个就是端口转发,也叫 隧道 tunnel , 能封装一些没有加密功能的tcp协议 telnet ,smtp 等  让这些不安全的协议的数据包由ssh 加密后安全传输, 而且能通过跳板机穿透防火墙的限制等.">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://47.91.157.219/ssh/ssh.png">
+<meta property="og:image" content="http://47.91.157.219/ssh/ssh2.png">
+<meta property="og:image" content="http://47.91.157.219/ssh/ssh3.png">
+<meta property="og:image" content="http://47.91.157.219/ssh/ssh4.png">
+<meta property="og:image" content="http://47.91.157.219/ssh/ssh5.png">
+<meta property="og:image" content="http://47.91.157.219/ssh/ssh6.png">
+<meta property="og:image" content="http://47.91.157.219/ssh/ssh7.png">
+<meta property="og:image" content="http://47.91.157.219/ssh/ssh8.png">
+<meta property="og:image" content="http://47.91.157.219/ssh/ssh9.png">
+<meta property="og:image" content="http://47.91.157.219/ssh/ssh10.png">
+<meta property="og:updated_time" content="2017-10-06T07:03:01.630Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ssh隧道技术">
+<meta name="twitter:description" content="ssh隧道ssh通常用于加密的远程登陆,其他ssh功能非常强大,其中一个就是端口转发,也叫 隧道 tunnel , 能封装一些没有加密功能的tcp协议 telnet ,smtp 等  让这些不安全的协议的数据包由ssh 加密后安全传输, 而且能通过跳板机穿透防火墙的限制等.">
+<meta name="twitter:image" content="http://47.91.157.219/ssh/ssh.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-14-ssh_tunnel" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/06/2017-09-14-ssh_tunnel/" class="article-date">
+  <time datetime="2017-10-06T07:03:01.630Z" itemprop="datePublished">2017-10-06</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ssh隧道技术
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h3 id="ssh隧道"><a href="#ssh隧道" class="headerlink" title="ssh隧道"></a>ssh隧道</h3><p>ssh通常用于加密的远程登陆,其他ssh功能非常强大,其中一个就是端口转发,也叫 隧道 <code>tunnel</code> , 能封装一些没有加密功能的tcp协议 telnet ,smtp 等  让这些不安全的协议的数据包由ssh 加密后安全传输, 而且能通过跳板机穿透防火墙的限制等.</p>
+<a id="more"></a>
+<h3 id="ssh-端口转发实例"><a href="#ssh-端口转发实例" class="headerlink" title="ssh 端口转发实例"></a>ssh 端口转发实例</h3><h4 id="场景一"><a href="#场景一" class="headerlink" title="场景一:"></a>场景一:</h4><p><img src="http://47.91.157.219/ssh/ssh.png" alt="本地转发"></p>
+<ul>
+<li>公司内有两台服务器 <code>172.18.0.10</code>  <code>172.18.0.11</code>  两台机器都是内网机器,相互之间可以通信</li>
+<li><code>172.18.0.10</code> 这台机器由两个IP 里一个是公网地址 <code>61.160.21.3</code> 可以与互联网通信,而且防火墙只允许这台机器ssh的22端口通过.</li>
+<li><code>192.168.0.25</code> 是公司的一个出差员工, 想要访问 公司内网中 <code>172.18.0.11</code> 服务器.  但他只能远程 <code>61.160.21.3</code> 到这台主机上.</li>
+</ul>
+<p>在这样的情况下就可利用ssh的隧道功能访问</p>
+<blockquote>
+<p>员工如果是linux系统可以运行以下命令</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh -L 1080:172.18.0.11:80  61.160.21.3</div></pre></td></tr></table></figure>
+<p>分析 : <code>-L</code>  : local表示本地转发 ,如图所示 客户端自己开个端口 <code>1080</code> 监听自己ip的 1080 端口 , 所有通过这个 端口的数据包,都会由 客户端和<code>61.160.21.3</code> 连接的ssh 加密后安全送到 <code>61.160.21.3</code> </p>
+<p><code>172.18.0.11:80</code> 这台服务器解密后发现里面是个 <code>172.18.0.11:80</code> ,就去找这台服务器, 响应后原路返回</p>
+<p>注意 : 运行这条命令后,客户端会ssh登陆到    <code>61.160.21.3</code>  服务器上 ,此时隧道已经搭建好 , 浏览器中输入 </p>
+<p><code>http://127.0.0.1:1080</code> 相当于间接访问  <code>http://172.18.0.11:80</code> </p>
+<blockquote>
+<p>windous服务器可以利用xhell来搭建隧道</p>
+</blockquote>
+<p>搭建方式:<br>选择远程主机ip地址</p>
+<p><img src="http://47.91.157.219/ssh/ssh2.png" alt="本地转发"></p>
+<p>点击隧道 —&gt; 添加—&gt;选择类型—&gt;源主机—&gt;目标主机—&gt;目标端口</p>
+<p><img src="http://47.91.157.219/ssh/ssh3.png" alt="本地转发"></p>
+<p>然后连接登陆上去就可以了,这样的就叫本地转发</p>
+<h4 id="场景二"><a href="#场景二" class="headerlink" title="场景二 :"></a>场景二 :</h4><p><img src="http://47.91.157.219/ssh/ssh4.png" alt="远程转发"></p>
+<p>如图如果在公司里``想访问家里电脑的资源,而且有一台公司的服务器,就可以使用远程转发的方式前提条件</p>
+<ul>
+<li>你对服务器<code>103.27.14.2</code> 由管理权限,能控制监听的端口</li>
+<li>ssh命令需要在被访问的的机器上运行,例如: 公司内网机器访问家庭的,需要在家庭机器上开隧道</li>
+<li>被访问的机器需要开发端口,一般pc机防火墙会默认阻止外来的主动连接</li>
+</ul>
+<blockquote>
+<p>如果家庭内网机器 <code>192.18.31.2</code> 是linux主机 可以运行</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh -R 1080:192.18.31.2:80 103.27.14.2</div></pre></td></tr></table></figure>
+<p><code>-R</code> :表示开启远程转发, <code>192.18.31.2</code> 与 <code>103.27.14.2</code> 建立ssh 隧道后,相当与 <code>103.27.14.2</code> 这个有公网地址的服务器帮你监听 <code>1080</code> 端口, 并把通过这个端口的所有连接 转成 访问<code>192.18.31.2:80</code>的请求公司内网中的机器就可以利用 <code>http://103.27.14.2:1080</code> 的url 访问家庭内网中的主机 .</p>
+<p>这种方式有点类似与 在路由器上做端口映射,但是一般家庭的路由ip地址是动态获取,不是固定的.还要用申请动态域名的东西, 非常麻烦,linux一条命令搞定</p>
+<blockquote>
+<p>如果windons可以用xshell做隧道如下方式</p>
+</blockquote>
+<p>选择远程主机地址,和本地端口转发一样</p>
+<p><img src="http://47.91.157.219/ssh/ssh5.png" alt="远程转发"></p>
+<h4 id="场景三"><a href="#场景三" class="headerlink" title="场景三:"></a>场景三:</h4><p>有墙的地方</p>
+<p>我们可以利用 ssh + sock5 的方式,穿透防火墙 , sock5 是一种动态代理技术,</p>
+<p>ssh使用代理的命令为</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh -D 1080 &lt;remote_host&gt;      # &lt;remote_host&gt; 表示任意一台墙外的服务器主机</div></pre></td></tr></table></figure>
+<p>前提条件:</p>
+<ul>
+<li>你要有一台墙外的服务器并且能有个能ssh上去的普通用户</li>
+</ul>
+<p>windous使用xhell 翻越防火墙实例:</p>
+<p>选择类型为动态隧道</p>
+<p><img src="http://47.91.157.219/ssh/ssh6.png" alt="动态转发"></p>
+<p>远程上去后配置浏览器代理 firefox为例:</p>
+<p>依次选择  菜单—&gt;选项—&gt;高级—&gt;网络—&gt;设置<br><img src="http://47.91.157.219/ssh/ssh7.png" alt="动态转发"></p>
+<p>设置中选择监听本地的 <code>1080</code> 端口, 可以自己定义,与xhell中保持一致即可</p>
+<p><img src="http://47.91.157.219/ssh/ssh8.png" alt="动态转发"></p>
+<p>xshell连接成功后,点击 查看–&gt;隧道窗格–&gt;转义规则, 即可查看隧道连接情况,绿色小点表示成功</p>
+<p><img src="http://47.91.157.219/ssh/ssh9.png" alt="动态转发"></p>
+<p>之后就可以访问你想要的网站</p>
+<p><img src="http://47.91.157.219/ssh/ssh10.png" alt="动态转发"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/10/06/2017-09-14-ssh_tunnel/" data-id="cj8fk3ew20018gx7xcjcf144x" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/端口转发/">端口转发</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2017/10/06/2017-09-14-openssh/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          ssh
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/10/06/2017-09-14-sudo/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">sudo介绍</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#ssh隧道"><span class="toc-number">1.</span> <span class="toc-text">ssh隧道</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ssh-端口转发实例"><span class="toc-number">2.</span> <span class="toc-text">ssh 端口转发实例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#场景一"><span class="toc-number">2.1.</span> <span class="toc-text">场景一:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#场景二"><span class="toc-number">2.2.</span> <span class="toc-text">场景二 :</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#场景三"><span class="toc-number">2.3.</span> <span class="toc-text">场景三:</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>
