@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>bind+blz+mariadb 构建智能DNS | zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="概述最近学了bind和mysql基础,纯属为了练习操作,巩固知识,和理解bind和mysql是如何通过 blz结合的. 智能DNS的原理很简单, 当客户端访问同一个网站域名时,通过bind的view视图功能,匹配不同ip的客户端去查找不同zone下的A记录,解析到理客户端最近的服务器ip地址,以提高网站的访问速度 .这个功能正好符合中国南电信北网通的基本国情.">
+<meta name="keywords" content="DNS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="bind+blz+mariadb 构建智能DNS">
+<meta property="og:url" content="http://yoursite.com/2017/09/25/2017-09-25-dns/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:description" content="概述最近学了bind和mysql基础,纯属为了练习操作,巩固知识,和理解bind和mysql是如何通过 blz结合的. 智能DNS的原理很简单, 当客户端访问同一个网站域名时,通过bind的view视图功能,匹配不同ip的客户端去查找不同zone下的A记录,解析到理客户端最近的服务器ip地址,以提高网站的访问速度 .这个功能正好符合中国南电信北网通的基本国情.">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://47.91.157.219/images/mysql.png">
+<meta property="og:image" content="http://47.91.157.219/images/mysql2.png">
+<meta property="og:image" content="http://47.91.157.219/images/mysql3.png">
+<meta property="og:image" content="http://47.91.157.219/images/mysql4.png">
+<meta property="og:image" content="http://47.91.157.219/images/apnic.png">
+<meta property="og:updated_time" content="2017-10-06T08:10:14.103Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="bind+blz+mariadb 构建智能DNS">
+<meta name="twitter:description" content="概述最近学了bind和mysql基础,纯属为了练习操作,巩固知识,和理解bind和mysql是如何通过 blz结合的. 智能DNS的原理很简单, 当客户端访问同一个网站域名时,通过bind的view视图功能,匹配不同ip的客户端去查找不同zone下的A记录,解析到理客户端最近的服务器ip地址,以提高网站的访问速度 .这个功能正好符合中国南电信北网通的基本国情.">
+<meta name="twitter:image" content="http://47.91.157.219/images/mysql.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-25-dns" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/25/2017-09-25-dns/" class="article-date">
+  <time datetime="2017-09-24T16:00:00.000Z" itemprop="datePublished">2017-09-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/服务器架设/">服务器架设</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      bind+blz+mariadb 构建智能DNS
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>最近学了bind和mysql基础,纯属为了练习操作,巩固知识,和理解bind和mysql是如何通过 blz结合的. 智能DNS的原理很简单, 当客户端访问同一个网站域名时,通过bind的view视图功能,匹配不同ip的客户端去查找不同zone下的A记录,解析到理客户端最近的服务器ip地址,以提高网站的访问速度 .这个功能正好符合中国南电信北网通的基本国情.</p>
+<a id="more"></a>
+<h3 id="实验环境"><a href="#实验环境" class="headerlink" title="实验环境"></a>实验环境</h3><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bind版本</td>
+<td>BIND 9.11.0-P1</td>
+</tr>
+<tr>
+<td>mariaDB版本</td>
+<td>5.5.57-MariaDB(通用二进制)</td>
+</tr>
+<tr>
+<td>操作系统版本</td>
+<td>CentOS-6.9_86x64 (虚拟机环境)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="http://docs.linuxtone.org/ebooks/CDN/bind-dlz-view2.pdf" target="_blank" rel="external">http://docs.linuxtone.org/ebooks/CDN/bind-dlz-view2.pdf</a></p>
+<p><a href="http://www.jianshu.com/p/1318ef8865ba" target="_blank" rel="external">http://www.jianshu.com/p/1318ef8865ba</a></p>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><h4 id="安装mariaDB"><a href="#安装mariaDB" class="headerlink" title="安装mariaDB"></a>安装mariaDB</h4><p>安装数据库mysql和mariadb其实都一样,也可以直接使用yum安装mysql不过版本较低,这里使用通用二进制安装</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">tar xf mariadb-5.5.57-linux-x86_64.tar.gz -C /usr/local/</div><div class="line">cd /usr/local/</div><div class="line">ln -sv mariadb-5.5.57-linux-x86_64/ mysql</div><div class="line">cd mysql/</div><div class="line">groupadd -g 306 -r mysql</div><div class="line">useradd -r -g mysql -s /sbin/nologin mysql</div><div class="line">chown -R root.mysql .</div><div class="line">mkdir /mydata</div><div class="line">chown -R mysql.mysql /mydata</div><div class="line"><span class="meta">#</span> 准备数据库目录,为了更好的扩展性,可以专门创建一个LVM分区挂载到目录下,并格式化为xfs文件系统</div><div class="line"><span class="meta">#</span> 据说mysql跑再xfs文件系统上性能更好,以下过程为在/dev/sdb 上创建lvm 可跳过</div><div class="line">        parted /dev/sdb mklabel msdos</div><div class="line">        parted /dev/sdb mkpart primary 1 1000</div><div class="line">        parted /dev/sdb toggle 1 lvm</div><div class="line">        pvcreate /dev/sdb1</div><div class="line">        vgcreate myvg /dev/sdb1</div><div class="line">        lvcreate -n mylv -L 950M myvg</div><div class="line">        yum install xfsprogs</div><div class="line">        mkfs.xfs /dev/myvg/mylv</div><div class="line">        # 写入/etc/fstable中,可开机挂载</div><div class="line">        mount -a</div><div class="line">./scripts/mysql_install_db  --user=mysql --datadir=/mydata</div><div class="line">mkdir /etc/mydata</div><div class="line">cp support-files/my-huge.cnf /etc/mysql/my.cnf</div><div class="line">cp support-files/mysql.server /etc/init.d/mysqld</div><div class="line">chkconfig --add mysqld</div><div class="line"><span class="meta">#</span> 这里实际已经安装好了,为了易用性需要导出path路径,man文档,lib库,和头文件.</div><div class="line">vim /etc/man.config 添加 MANPATH /usr/local/mysql/man</div><div class="line">echo 'export PATH=/usr/local/mysql/bin:$PATH' &gt; /etc/profile.d/mysql.sh</div><div class="line">. /etc/profile.d/mysql.sh</div><div class="line">echo '/usr/local/mysql/lib' &gt; /etc/ld.so.conf.d/mysql.conf</div><div class="line">ldconfig -v</div><div class="line">ln -sv /usr/local/mysql/include/ /usr/include/mysql</div></pre></td></tr></table></figure>
+<h4 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">vim /etc/mysql/my.cnf</div><div class="line"><span class="meta">#</span> 修改或添加以下内容</div><div class="line">thread_concurrency = 2</div><div class="line">datadir=/mydata</div><div class="line">innodb_file_per_table = on</div><div class="line">skip_name_resolve = on</div></pre></td></tr></table></figure>
+<h4 id="启动mysql"><a href="#启动mysql" class="headerlink" title="启动mysql"></a>启动mysql</h4><p>启动是可能会报错,日志文件不可写,那就手动创建</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">service mysqld start</div><div class="line">touch /var/log/mysqld.log</div><div class="line">chmod 640 /var/log/mysqld.log</div><div class="line">chown mysql.mysql /var/log/mysqld.log</div><div class="line"><span class="meta">#</span> 运行mysql安全初始化脚本,这里设定root密码为 123456</div><div class="line">mysql_secure_installation</div></pre></td></tr></table></figure>
+<h4 id="编译安装bind"><a href="#编译安装bind" class="headerlink" title="编译安装bind"></a>编译安装bind</h4><p>安装bind必须要启用blz(Dynamically Loadable Zones) 模块,用于连接mysql的重要组件,而且bind版本貌似要高一点的版本低版本不支持 blz 还需要打补丁</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">tar xf bind-9.11.0-P1.tar.gz</div><div class="line">cd bind-9.10.1-P1</div><div class="line">./configure --with-dlz-mysql --prefix=/usr/local/bind --disable-ipv6 --disable-chroot </div><div class="line">make &amp;&amp; make install</div></pre></td></tr></table></figure>
+<p>编译安装bind不怎么费劲,配置有的麻烦,没有任何配置文件,区域文件,rndc也要自己配置,启动脚本也没有,权限什么的也要细心,搞不好服务就起不来</p>
+<h4 id="配置bind工作环境"><a href="#配置bind工作环境" class="headerlink" title="配置bind工作环境"></a>配置bind工作环境</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">useradd -r named -s /sbin/nologin</div><div class="line">mkdir /var/named</div><div class="line">chown root.named /var/named</div><div class="line">chmod 750 /var/named/</div><div class="line"><span class="meta">#</span> 导出man,path,lib,inclue等 ,bind程序lib中都是 *.a的库文件不需要导入</div><div class="line">vim /etc/man.config 添加 MANPATH /usr/local/bind/share/man</div><div class="line">echo 'export PATH=/usr/local/bind/bin:/usr/local/bind/sbin:$PATH' &gt; /etc/profile.d/bind.sh</div><div class="line">. /etc/profile.d/bind.sh</div><div class="line">ln -sv /usr/local/bind/include/ /usr/include/bind</div><div class="line"><span class="meta">#</span> 生成namd.ca文件</div><div class="line">dig -t NS . &gt; /var/named/named.ca</div><div class="line"><span class="meta">#</span> 配置rndc</div><div class="line">rndc-confgen -r /dev/urandom &gt; rndc.conf</div><div class="line">tail -11 rndc.conf &gt;&gt; named.conf</div><div class="line"><span class="meta">#</span> 修改/usr/local/bind/etc目录下文件权限</div><div class="line">chmod 640 .</div><div class="line">chown named.named .</div><div class="line"><span class="meta">#</span> 修改区域目录下文件的权限</div><div class="line">chmod -R 640 /var/named/*</div><div class="line">chown root.named /var/named/*</div></pre></td></tr></table></figure>
+<p>编辑named.conf文件,这里由于是实验环境,先做最简单的配置只需配置options字段和将rndc.conf 的key的配置加入namd.conf文件的末尾,稍后使用dlz配置区域文件,内容如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">options &#123;</div><div class="line">        directory "/var/named";</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="meta">#</span> Use with the following in named.conf, adjusting the allow list as needed:</div><div class="line">key "rndc-key" &#123;</div><div class="line">        algorithm hmac-md5;</div><div class="line">        secret "4ZJscDCbqAawFNdl6Bg2FQ==";</div><div class="line">&#125;;</div><div class="line"></div><div class="line">controls &#123;</div><div class="line">        inet 127.0.0.1 port 953</div><div class="line">                allow &#123; 127.0.0.1; &#125; keys &#123; "rndc-key"; &#125;;</div><div class="line">&#125;;</div><div class="line"><span class="meta">#</span> End of named.conf</div></pre></td></tr></table></figure>
+<p>导入配置文件后第一次启动使用命令方便排错,在前台运行报错提示很详细,基本上都是权限文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">named -u named -f -g -d 3</div></pre></td></tr></table></figure>
+<h4 id="配置启动脚本"><a href="#配置启动脚本" class="headerlink" title="配置启动脚本"></a>配置启动脚本</h4><p>配置启动脚本前</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>!/bin/bash</div><div class="line"><span class="meta">#</span> named a network name service.</div><div class="line"><span class="meta">#</span> chkconfig: 345 35 75</div><div class="line"><span class="meta">#</span> description: a name server</div><div class="line"> </div><div class="line">[ -r /etc/rc.d/init.d/functions ] &amp;&amp; . /etc/rc.d/init.d/functions</div><div class="line"> </div><div class="line">Builddir=/usr/local/bind/</div><div class="line">PidFile=/var/run/named/named.pid</div><div class="line">LockFile=/var/lock/subsys/named</div><div class="line">Sbindir=$&#123;Builddir&#125;/sbin</div><div class="line">Configfile=$&#123;Builddir&#125;/etc/named.conf</div><div class="line">CheckConf=$&#123;Builddir&#125;/sbin/named-checkconf</div><div class="line">named=named</div><div class="line"> </div><div class="line">if [ ! -f $&#123;Configfile&#125; ]</div><div class="line">then</div><div class="line">    echo "Can't find named.conf " </div><div class="line">    exit 1 </div><div class="line">fi</div><div class="line"> </div><div class="line">if [ ! -d /var/run/named/ ]  </div><div class="line">then</div><div class="line">    echo "could not open directory '/var/run/named/': Permission denied " </div><div class="line">    exit 1</div><div class="line">elif [ ! -w /var/run/named/ ]</div><div class="line">    then</div><div class="line">        echo "could not open directory '/var/run/named/': Permission denied "</div><div class="line">        exit 1</div><div class="line">fi</div><div class="line"> </div><div class="line"> </div><div class="line">if [ ! -r $&#123;Configfile&#125; ]</div><div class="line">then</div><div class="line">    echo "Error: $&#123;Configfile&#125; is not readfile!"</div><div class="line">    exit 1</div><div class="line">else</div><div class="line">    $CheckConf</div><div class="line">    if [ $? != 0 ]</div><div class="line">    then</div><div class="line">        echo -e "Please check config file in \033[31m$&#123;Configfile&#125; \033[0m!"</div><div class="line">        exit 2</div><div class="line">    fi</div><div class="line">fi</div><div class="line"> </div><div class="line">start() &#123;</div><div class="line">    [ -x $&#123;Builddir&#125;/sbin/$named ] ||   exit 4</div><div class="line">    if [ -f $LockFile ]; then</div><div class="line">        echo -n "$named is already running..."</div><div class="line">        echo_failure</div><div class="line">        echo</div><div class="line">        exit 5</div><div class="line">    fi</div><div class="line">     </div><div class="line">    echo -n "Starting $named: "</div><div class="line">    daemon --pidfile "$PidFile" $&#123;Sbindir&#125;/$named -u named -4 -c $&#123;Configfile&#125;</div><div class="line">    RETVAL=$?</div><div class="line">    echo</div><div class="line">    if [ $RETVAL -eq 0 ]; then</div><div class="line">        touch $LockFile</div><div class="line">        return 0</div><div class="line">    else</div><div class="line">        rm -f $LockFile $PidFile</div><div class="line">        return 1</div><div class="line">    fi</div><div class="line">&#125;</div><div class="line"> </div><div class="line">stop() &#123;</div><div class="line">    if [ ! -f $LockFile ];then</div><div class="line">        echo "$named is not started."</div><div class="line">        echo_failure</div><div class="line">    fi</div><div class="line"> </div><div class="line">    echo -n "Stopping $named: "</div><div class="line">    killproc $named</div><div class="line">    RETVAL=$?</div><div class="line">    echo</div><div class="line">    [ $RETVAL -eq 0 ] &amp;&amp; rm -f $LockFile</div><div class="line">    return 0</div><div class="line">&#125;</div><div class="line"> </div><div class="line">restart() &#123;</div><div class="line">    stop</div><div class="line">    sleep 1</div><div class="line">    start</div><div class="line">&#125;</div><div class="line"> </div><div class="line">reload() &#123;</div><div class="line">    echo -n "Reloading $named: "</div><div class="line">    killproc $named -HUP</div><div class="line">    RETVAL=$?</div><div class="line">    echo</div><div class="line">    return $RETVAL</div><div class="line">&#125;</div><div class="line"> </div><div class="line">status() &#123;</div><div class="line">    if pidof $named &gt; /dev/null &amp;&amp; [ -f $PidFile ]; then</div><div class="line">        echo "$named is running..."</div><div class="line">    else</div><div class="line">        echo "$named is stopped..."</div><div class="line">    fi</div><div class="line">&#125;</div><div class="line"> </div><div class="line">case $1 in</div><div class="line">start)</div><div class="line">    start ;;</div><div class="line">stop) </div><div class="line">    stop ;;</div><div class="line">restart)</div><div class="line">    restart ;;</div><div class="line">reload)</div><div class="line">    reload ;;</div><div class="line">status)</div><div class="line">    status ;;</div><div class="line">*)</div><div class="line">    echo "Usage:named &#123;start|stop|status|reload|restart&#125;"</div><div class="line">    exit 2;;</div><div class="line">esac</div></pre></td></tr></table></figure>
+<h4 id="脚本启动named"><a href="#脚本启动named" class="headerlink" title="脚本启动named"></a>脚本启动named</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">mkdir /var/run/named</div><div class="line">chmod +x /etc/init.d/named</div><div class="line">chkconfig --add named</div></pre></td></tr></table></figure>
+<h4 id="创建库和表"><a href="#创建库和表" class="headerlink" title="创建库和表"></a>创建库和表</h4><p>使用下面sql语句创建dns_data数据库和dns_record 表,保存文件导入就行</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">DROP</span> <span class="keyword">DATABASE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> dns_data;</div><div class="line"><span class="keyword">CREATE</span> <span class="keyword">DATABASE</span> dns_data;</div><div class="line"> <span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> dns_data.dns_records;</div><div class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> dns_data.dns_records (</div><div class="line"> <span class="keyword">id</span> <span class="built_in">int</span>(<span class="number">10</span>) <span class="keyword">unsigned</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> auto_increment,</div><div class="line"> zone <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line"> host <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">default</span> <span class="string">'@'</span>,</div><div class="line"> <span class="keyword">type</span> ENUM (<span class="string">'MX'</span>,<span class="string">'CNAME'</span>,<span class="string">'NS'</span>,<span class="string">'SOA'</span>,<span class="string">'A'</span>,<span class="string">'PTR'</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line"> <span class="keyword">data</span> <span class="built_in">varchar</span>(<span class="number">255</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line"> ttl <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">default</span> <span class="string">'800'</span>,</div><div class="line"> <span class="keyword">view</span> ENUM (<span class="string">'cnc'</span>,<span class="string">'chinanet'</span>,<span class="string">'any'</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">default</span> <span class="string">'any'</span>, </div><div class="line"> mx_priority <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">default</span> <span class="literal">NULL</span>,</div><div class="line"> <span class="keyword">refresh</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">default</span> <span class="string">'3600'</span>,</div><div class="line"> retry <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">default</span> <span class="string">'3600'</span>,</div><div class="line"> <span class="keyword">expire</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">default</span> <span class="string">'86400'</span>,</div><div class="line"> <span class="keyword">minimum</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">default</span> <span class="string">'3600'</span>,</div><div class="line"> <span class="built_in">serial</span> <span class="built_in">bigint</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">default</span> <span class="string">'2017092501'</span>,</div><div class="line"> resp_person <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">default</span> <span class="string">'admin.zxs.com.'</span>,</div><div class="line"> primary_ns <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> <span class="keyword">default</span> <span class="string">'ns1.zxs.com.'</span>,</div><div class="line"> PRIMARY <span class="keyword">KEY</span> (<span class="keyword">id</span>),</div><div class="line"> <span class="keyword">KEY</span> <span class="keyword">type</span> (<span class="keyword">type</span>),</div><div class="line"> <span class="keyword">KEY</span> host (host),</div><div class="line"> <span class="keyword">KEY</span> zone (zone)</div><div class="line">) <span class="keyword">ENGINE</span>=MyISAM AUTO_INCREMENT=<span class="number">1</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8;</div></pre></td></tr></table></figure>
+<p>表结构如下图:</p>
+<p><img src="http://47.91.157.219/images/mysql.png" alt="dns_records结构"></p>
+<h4 id="导入记录"><a href="#导入记录" class="headerlink" title="导入记录"></a>导入记录</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`dns_records`</span> (<span class="string">`zone`</span>, <span class="string">`host`</span>, <span class="string">`type`</span>, <span class="string">`data`</span>, <span class="string">`ttl`</span>,<span class="string">`mx_priority`</span>, <span class="string">`refresh`</span>, <span class="string">`retry`</span>, <span class="string">`expire`</span>,</div><div class="line"><span class="string">`minimum`</span>, <span class="string">`serial`</span>, <span class="string">`resp_person`</span>, <span class="string">`primary_ns`</span>) <span class="keyword">VALUES</span></div><div class="line">(<span class="string">'zxs.com'</span>, <span class="string">'@'</span>, <span class="string">'SOA'</span>, <span class="string">'ns1.zxs.com.'</span>, <span class="number">10</span>, <span class="literal">NULL</span>, <span class="number">3600</span>, <span class="number">3600</span>, <span class="number">86400</span>, <span class="number">10</span>, <span class="number">2017092501</span>,</div><div class="line"><span class="string">'admin.zxs.com.'</span>, <span class="string">'ns1.zxs.com.'</span>); </div><div class="line"></div><div class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`dns_records`</span> (<span class="string">`zone`</span>, <span class="string">`host`</span>, <span class="string">`type`</span>, <span class="string">`data`</span>) <span class="keyword">VALUES</span></div><div class="line">(<span class="string">'zxs.com'</span>, <span class="string">'@'</span>, <span class="string">'NS'</span>, <span class="string">'ns1.zxs.com.'</span>);</div><div class="line"></div><div class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`dns_records`</span> (<span class="string">`zone`</span>, <span class="string">`host`</span>, <span class="string">`type`</span>, <span class="string">`data`</span>) <span class="keyword">VALUES</span></div><div class="line">(<span class="string">'zxs.com'</span>, <span class="string">'ns1'</span>, <span class="string">'A'</span>, <span class="string">'192.168.5.115'</span>);</div><div class="line"></div><div class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`dns_records`</span> (<span class="string">`zone`</span>, <span class="string">`host`</span>, <span class="string">`type`</span>, <span class="string">`data`</span>, <span class="string">`ttl`</span>, <span class="string">`view`</span>) <span class="keyword">VALUES</span></div><div class="line">(<span class="string">'zxs.com'</span>, <span class="string">'www'</span>, <span class="string">'A'</span>, <span class="string">'6.6.6.6'</span>, <span class="number">3600</span>, <span class="string">'cnc'</span>),</div><div class="line">(<span class="string">'zxs.com'</span>, <span class="string">'www'</span>, <span class="string">'A'</span>, <span class="string">'7.7.7.7'</span>, <span class="number">3600</span>, <span class="string">'chinanet'</span>),</div><div class="line">(<span class="string">'zxs.com'</span>, <span class="string">'www'</span>, <span class="string">'A'</span>, <span class="string">'8.8.8.8'</span>, <span class="number">3600</span>, <span class="string">'any'</span>);</div></pre></td></tr></table></figure>
+<p>实验添加的记录为:</p>
+<p>解析域名<code>www.zxs.com</code>  三条A记录 分别是 网通客户端 (cnc) 指向 6.6.6.6  电信客户端(chinanet) 指向 7.7.7.7  其他指向 8.8.8.8</p>
+<p>表数据如下图:</p>
+<p><img src="http://47.91.157.219/images/mysql2.png" alt="dns_records表数据"></p>
+<h4 id="配置dlz连接到数据库"><a href="#配置dlz连接到数据库" class="headerlink" title="配置dlz连接到数据库"></a>配置dlz连接到数据库</h4><p>实验为了测试效果使用的是内网ip代表电信的ip, 和网通的ip,  </p>
+<p>简化起见没有配置根区域,dns不允许递归查询的话也没有必要配置根区域 ,所有的acl 和 view都定义在一个配置文件中</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">options &#123;</div><div class="line">	directory "/var/named";</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="meta">#</span> Use with the following in named.conf, adjusting the allow list as needed:</div><div class="line">key "rndc-key" &#123;</div><div class="line">	algorithm hmac-md5;</div><div class="line">	secret "4ZJscDCbqAawFNdl6Bg2FQ==";</div><div class="line">&#125;;</div><div class="line"></div><div class="line"></div><div class="line">controls &#123;</div><div class="line"> 	inet 127.0.0.1 port 953</div><div class="line"> 		allow &#123; 127.0.0.1; &#125; keys &#123; "rndc-key"; &#125;;</div><div class="line">&#125;;</div><div class="line"><span class="meta">#</span> End of named.conf</div><div class="line"></div><div class="line">acl cnc &#123;</div><div class="line">	172.18.0.0/16;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">acl chinanet &#123;</div><div class="line">	192.168.5.0/24;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">view cnc_view &#123;</div><div class="line">	match-clients &#123; cnc; &#125;;</div><div class="line">	dlz "Mysql zone" &#123;</div><div class="line">               database        "mysql</div><div class="line">               &#123;host=localhost dbname=dns_data ssl=false port=3306 user=root pass=123456&#125;</div><div class="line">               &#123;select zone from dns_records where zone='$zone$'&#125;</div><div class="line">               &#123;select ttl, type, mx_priority, case when lower(type)='txt' then concat('\"', data, '\"') when lower(type) = 'soa' then concat_ws(' ', data, resp_person, serial, refresh, retry, expire, minimum) else data end from dns_records where zone = '$zone$' and host = '$record$' and view='cnc'&#125;"; </div><div class="line">        &#125;;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">view chinanet_view &#123;</div><div class="line">	match-clients &#123; chinanet; &#125;;</div><div class="line">	dlz "Mysql zone" &#123;</div><div class="line">               database        "mysql</div><div class="line">               &#123;host=localhost dbname=dns_data ssl=false port=3306 user=root pass=123456&#125;</div><div class="line">               &#123;select zone from dns_records where zone='$zone$'&#125;</div><div class="line">               &#123;select ttl, type, mx_priority, case when lower(type)='txt' then concat('\"', data, '\"') when lower(type) = 'soa' then concat_ws(' ', data, resp_person, serial, refresh, retry, expire, minimum) else data end from dns_records where zone = '$zone$' and host = '$record$' and view='chinanet'&#125;"; </div><div class="line">        &#125;;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h4 id="测试效果"><a href="#测试效果" class="headerlink" title="测试效果"></a>测试效果</h4><p>为了内网的ip段<code>172.18.0.0/16</code>  <code>192.168.5.0/24</code>  都能指定这个dns服务器解析,本机配置了两个ip <code>192.168.5.115</code>  和 <code>172.18.5.115</code>  ,使用不同网段机器测试效果如下</p>
+<p><img src="http://47.91.157.219/images/mysql3.png" alt="测试1"></p>
+<p><img src="http://47.91.157.219/images/mysql4.png" alt="测试2"></p>
+<h3 id="如何获得电信联通ip地址列表"><a href="#如何获得电信联通ip地址列表" class="headerlink" title="如何获得电信联通ip地址列表"></a>如何获得电信联通ip地址列表</h3><h4 id="方法一-网站下载"><a href="#方法一-网站下载" class="headerlink" title="方法一: 网站下载"></a>方法一: 网站下载</h4><p>​    有个网站叫 <a href="https://ispip.clang.cn/" target="_blank" rel="external">苍狼山庄</a> 每日更新</p>
+<h4 id="方法二-whois程序查询"><a href="#方法二-whois程序查询" class="headerlink" title="方法二: whois程序查询"></a>方法二: whois程序查询</h4><p>centos yum源下就有whois工具, 也可以上apnic 亚太互联网络信息中心网站上下载v3版的最新工具来编译安装</p>
+<p><img src="http://47.91.157.219/images/apnic.png" alt="apnic"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">wget http://ftp.apnic.net/apnic/dbase/tools/ripe-dbase-client-v3.tar.gz</div><div class="line">tar xzvf ripe-dbase-client-v3.tar.gz</div><div class="line">cd whois-3.1</div><div class="line">./configure</div><div class="line">make</div></pre></td></tr></table></figure>
+<h4 id="whois使用用法"><a href="#whois使用用法" class="headerlink" title="whois使用用法"></a>whois使用用法</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">./whois3 -h whois.apnic.net -l -i mb MAINT-CNCGROUP &gt; /tmp/cnc</div><div class="line">./whois3 -h whois.apnic.net -l -i mb MAINT-CHINANET &gt; /tmp/chinanet</div><div class="line">./whois3 -h whois.apnic.net -l -i mb MAINT-CN-CRTC &gt; /tmp/crtc</div><div class="line">./whois3 -h whois.apnic.net -l -i mb MAINT-CN-CMCC &gt; /tmp/cmcc</div></pre></td></tr></table></figure>
+<p>上面查询出来的内容,很详细,包括电话号码,地址定位到某条街,如果只想获取acl列表,需要用 文本三剑客了</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">./whois3 -h whois.apnic.net -l -i mb MAINT-CNCGROUP | grep "descr" | grep "Reverse" | awk -F "for" '&#123;if ($2!="") print $2&#125;'| sort -n | awk 'BEGIN&#123;print "acl \"CNC\" '&#123;'"&#125;&#123;print $1";"&#125;END&#123;print "'&#125;';"&#125;' &gt; /root/cnc_acl.conf</div><div class="line"></div><div class="line">./whois3 -h whois.apnic.net -l -i mb MAINT-CHINANET | grep "descr" | grep "Reverse" | awk -F "for" '&#123;if ($2!="") print $2&#125;'| sort -n | awk 'BEGIN&#123;print "acl \"CHINANET\" '&#123;'"&#125;&#123;print $1";"&#125;END&#123;print "'&#125;';"&#125;' &gt; /root/chinanet_acl.conf</div><div class="line"></div><div class="line">./whois3 -h whois.apnic.net -l -i mb MAINT-CN-CRTC | grep "descr" | grep "Reverse" | awk -F "for" '&#123;if ($2!="") print $2&#125;'| sort -n | awk 'BEGIN&#123;print "acl \"CRTC\" '&#123;'"&#125;&#123;print $1";"&#125;END&#123;print "'&#125;';"&#125;' &gt; /root/crtc_acl.conf</div><div class="line"></div><div class="line">./whois3 -h whois.apnic.net -l -i mb MAINT-CN-CMCC | grep "descr" | grep "Reverse" | awk -F "for" '&#123;if ($2!="") print $2&#125;'| sort -n | awk 'BEGIN&#123;print "acl \"CMCC\" '&#123;'"&#125;&#123;print $1";"&#125;END&#123;print "'&#125;';"&#125;' &gt; /root/cmcc_acl.conf</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/25/2017-09-25-dns/" data-id="cj8fm2gcj001ix37xae3xdzki" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DNS/">DNS</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/09/18/2017-09-18-cobbler/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">cobbler</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实验环境"><span class="toc-number">2.</span> <span class="toc-text">实验环境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考资料"><span class="toc-number">3.</span> <span class="toc-text">参考资料</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#步骤"><span class="toc-number">4.</span> <span class="toc-text">步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#安装mariaDB"><span class="toc-number">4.1.</span> <span class="toc-text">安装mariaDB</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#修改配置文件"><span class="toc-number">4.2.</span> <span class="toc-text">修改配置文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#启动mysql"><span class="toc-number">4.3.</span> <span class="toc-text">启动mysql</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#编译安装bind"><span class="toc-number">4.4.</span> <span class="toc-text">编译安装bind</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#配置bind工作环境"><span class="toc-number">4.5.</span> <span class="toc-text">配置bind工作环境</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#配置启动脚本"><span class="toc-number">4.6.</span> <span class="toc-text">配置启动脚本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#脚本启动named"><span class="toc-number">4.7.</span> <span class="toc-text">脚本启动named</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#创建库和表"><span class="toc-number">4.8.</span> <span class="toc-text">创建库和表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#导入记录"><span class="toc-number">4.9.</span> <span class="toc-text">导入记录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#配置dlz连接到数据库"><span class="toc-number">4.10.</span> <span class="toc-text">配置dlz连接到数据库</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#测试效果"><span class="toc-number">4.11.</span> <span class="toc-text">测试效果</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#如何获得电信联通ip地址列表"><span class="toc-number">5.</span> <span class="toc-text">如何获得电信联通ip地址列表</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#方法一-网站下载"><span class="toc-number">5.1.</span> <span class="toc-text">方法一: 网站下载</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#方法二-whois程序查询"><span class="toc-number">5.2.</span> <span class="toc-text">方法二: whois程序查询</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#whois使用用法"><span class="toc-number">5.3.</span> <span class="toc-text">whois使用用法</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--个人微信二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>sellinux简单介绍 | zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="selinux概念selinux(secure enhanced linux)是美国国家安全局(NSA=The National Security Agency)和SCC(SecureComputing Corporation)开发的 Linux的一个强制访问控制的安全模块。2000年以GNU GPL发布，Linux内核2.6版本后集成在内核中">
+<meta name="keywords" content="semanage">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sellinux简单介绍">
+<meta property="og:url" content="http://yoursite.com/2017/09/03/2017-09-03-selinux/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:description" content="selinux概念selinux(secure enhanced linux)是美国国家安全局(NSA=The National Security Agency)和SCC(SecureComputing Corporation)开发的 Linux的一个强制访问控制的安全模块。2000年以GNU GPL发布，Linux内核2.6版本后集成在内核中">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-10-06T08:10:14.085Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="sellinux简单介绍">
+<meta name="twitter:description" content="selinux概念selinux(secure enhanced linux)是美国国家安全局(NSA=The National Security Agency)和SCC(SecureComputing Corporation)开发的 Linux的一个强制访问控制的安全模块。2000年以GNU GPL发布，Linux内核2.6版本后集成在内核中">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-03-selinux" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/03/2017-09-03-selinux/" class="article-date">
+  <time datetime="2017-09-02T16:00:00.000Z" itemprop="datePublished">2017-09-03</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/安全/">安全</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      sellinux简单介绍
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h3 id="selinux概念"><a href="#selinux概念" class="headerlink" title="selinux概念"></a>selinux概念</h3><p>selinux(secure enhanced linux)是美国国家安全局(NSA=The National Security Agency)和SCC(SecureComputing Corporation)开发的 Linux的一个强制访问控制的安全模块。2000年以GNU GPL发布，Linux内核2.6版本后集成在内核中</p>
+<a id="more"></a>
+<p><code>DAC</code>：Discretionary Access Control自由访问控制</p>
+<p><code>MAC</code>：Mandatory Access Control 强制访问控制</p>
+<p>DAC环境下进程是无束缚的<br>MAC环境下策略的规则决定控制的严格程度<br>MAC环境下进程可以被限制的策略被用来定义被限制的进程能够使用那些资源（文件和端口）默认情况下，没有被明确允许的行为将被拒绝</p>
+<h4 id="sellinux如何工作的"><a href="#sellinux如何工作的" class="headerlink" title="sellinux如何工作的"></a>sellinux如何工作的</h4><p>selinux也有安全上下文的概念,在sellinux眼中一切皆对象(文件,目录,进程,端口等)  ,在每个对象selinux中,都给对象的inode表中打上一个安全标签,并且限定某个进程只能某一类标签.标签有5类属性如下所示:</p>
+<p>5类属性   user:role:type:sensitivity:category</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">system_u:object_r:admin_home_t:s0                # 最后一项一般不列出</div></pre></td></tr></table></figure>
+<p><code>selinux期望安全向下文</code> :selinux对各种常用的进程服务都有限定访问那一类的安全标签,并将数据存储在自己的数据库中</p>
+<blockquote>
+<p>查看selinux数据中的定义</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">semanage fcontext –l      # 此工具由policycoreutils-python 程序包提供</div></pre></td></tr></table></figure>
+<p><code>实际安全上下文</code> :实际的seinux安全上下文,是系统当前正在应用的安全标签</p>
+<blockquote>
+<p>查看文件安全标签</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# ls -Z /root/.ssh/authorized_keys </div><div class="line">-rw-------. root root unconfined_u:object_r:ssh_home_t:s0 /root/.ssh/authorized_keys</div></pre></td></tr></table></figure>
+<blockquote>
+<p>查看进程的标签</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root: ~]# ps auxZ | grep httpd</div><div class="line">unconfined_u:system_r:httpd_t:s0 root      1869  0.0  0.7 175396  3792 ?        Ss   22:23   0:00 /usr/sbin/httpd</div></pre></td></tr></table></figure>
+<p>当实际selinux安全上下文,不符合selinux数据库中的定义时,此时就会导致进程无法访问这个资源</p>
+<h4 id="selinux工作类型"><a href="#selinux工作类型" class="headerlink" title="selinux工作类型"></a>selinux工作类型</h4><p>以下的类型不是所有的centos版本都有,默认都是用targert ,其他种类要么稳定要么被废弃了.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">centos 7 中 /etc/selinux/config 文件</div><div class="line"># SELINUXTYPE= can take one of three two values:</div><div class="line">#     targeted - Targeted processes are protected,</div><div class="line">#     minimum - Modification of targeted policy. Only selected processes are protected. </div><div class="line">#     mls - Multi Level Security protection.</div><div class="line">SELINUXTYPE=targeted</div></pre></td></tr></table></figure>
+<ul>
+<li>target:用来保护常见的网络服务,仅有限的进程受到selinux控制</li>
+<li>strict :所有的进程都受selinux控制</li>
+<li>minimum:(centos7 上有) 只限制自己选择的网络服务</li>
+<li>mls:提供MLS(多级安全)机制的安全性</li>
+</ul>
+<h4 id="安全标签类型"><a href="#安全标签类型" class="headerlink" title="安全标签类型"></a>安全标签类型</h4><p><code>User</code> :指示登录系统的用户类型,如root,user_u,system_u,多数本地进程都属于自由（unconfined）进程</p>
+<p><code>Role</code> :定义文件，进程和用户的用途：文件:object_r，进程和用户：system_r</p>
+<p><code>Type</code> :指定数据类型，规则中定义何种进程类型访问何种文件Target策略基于type实现,多服务共用：public_content_t</p>
+<p><code>Sensitivity</code> :限制访问的需要，由组织定义的分层安全级别，如unclassified, secret,top,secret, 一个对象有且只有一个sensitivity,分0-15级，s0最低,Target策略默认使用s0</p>
+<p><code>Category</code>：对于特定组织划分不分层的分类，如FBI Secret，NSA secret, 一个对象可以有多个categroy， c0-c1023共1024个分类， Target 策略不使用category</p>
+<h3 id="sellinux设置"><a href="#sellinux设置" class="headerlink" title="sellinux设置"></a>sellinux设置</h3><h4 id="启用selinux"><a href="#启用selinux" class="headerlink" title="启用selinux"></a>启用selinux</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sed -i &apos;/^SELINUX=/c\SELINUX=enforcing&apos;  /etc/selinux/config        #修改配置文件</div><div class="line">setenforce 1|0                                                     #临时启用|禁用</div><div class="line">getenforce                                                         #查看当前状态</div><div class="line">sestatus                                                           #查看状态详情</div></pre></td></tr></table></figure>
+<h4 id="给文件打标签"><a href="#给文件打标签" class="headerlink" title="给文件打标签"></a>给文件打标签</h4><blockquote>
+<p>例如:  改变文件标签</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root: ~]# ls -Z /var/log/messages           # 查看文件类型为var_log_t</div><div class="line">-rw-------. root root system_u:object_r:var_log_t:s0   /var/log/messages </div><div class="line">[root: ~]# cp /var/log/messages /root/</div><div class="line">[root: ~]# ls -Z /root/messages              # cp不带选项复制会继承目标目录的安全标签</div><div class="line">-rw-------. root root unconfined_u:object_r:admin_home_t:s0 /root/messages</div><div class="line">[root: ~]# \mv /root/messages /var/log/messages       #强行覆盖原来的文件</div><div class="line">[root: ~]# ls -Z /var/log/messages                    #文件安全标签改变为admin_home_t</div><div class="line">-rw-------. root root unconfined_u:object_r:admin_home_t:s0 /var/log/messages</div><div class="line">[root: ~]# logger &quot;test log&quot;              # 测试能否写日志 ,查看已经无法写入</div></pre></td></tr></table></figure>
+<blockquote>
+<p>恢复文件标签</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[root: ~]# semanage fcontext -l | grep /var/log/messages        # 查看数据库中的 var_log_t</div><div class="line">/var/log/messages[^/]*     all files    system_u:object_r:var_log_t:s0 </div><div class="line">[root: ~]# chcon -t var_log_t /var/log/messages                 # 修改文件的安全标签类型</div><div class="line">[root: ~]# service rsyslog restart                              # 重启日志服务程序</div></pre></td></tr></table></figure>
+<blockquote>
+<p>添加安全标签</p>
+</blockquote>
+<p>例如: 创建站点目录 /www 让selinux限定不期望其他进程访问此目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[root: /]# mkdir /www</div><div class="line">[root: /]# ls -dZ /www                  # 新建的文件默认安全标签为default_t</div><div class="line">drwxr-xr-x. root root unconfined_u:object_r:default_t:s0 /www </div><div class="line">[root: /]# fcontext -a -t httpd_sys_content_t &apos;/www(/.*)?&apos;           # 添加selinux数据库中的记录</div><div class="line">[root: /]# restorecon -R /www                                        # 恢复数据库的标签到目录</div></pre></td></tr></table></figure>
+<blockquote>
+<p>删除安全标签</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root: /]# semanage fcontext -d -t httpd_sys_content_t &apos;/www(/.*)?&apos;</div><div class="line">[root: /]# restorecon -R /www   #前面删除的是,数据库中的定义,实际文件标签并没有修改,要恢复同步到文件</div></pre></td></tr></table></figure>
+<h4 id="给端口打标签"><a href="#给端口打标签" class="headerlink" title="给端口打标签"></a>给端口打标签</h4><p>在selinux启动的情况下,sshd程序想要修改自己监听端口,此时如果非标准端口不在selinux期望值内,会导致端口不可用.</p>
+<p>例如: 修改sshd监听端口后,系统可能会报如下错误.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# systemctl restart sshd</div><div class="line">Job for sshd.service failed because a configured resource limit was exceeded. See &quot;systemctl status sshd.service&quot; and &quot;journalctl -xe&quot; for details.</div></pre></td></tr></table></figure>
+<blockquote>
+<p>查看端口标签</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# semanage port -l | grep ssh</div><div class="line">ssh_port_t                     tcp      22               # seliunx期望的sshd 监听端口为22</div></pre></td></tr></table></figure>
+<blockquote>
+<p>添加端口标签</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# semanage port -a -t ssh_port_t -p tcp 2222      # 添加端口到selinux数据库中</div><div class="line">&lt;root: ~&gt;# semanage port -l | grep ssh</div><div class="line">ssh_port_t                     tcp      2222, 22</div><div class="line">&lt;root: ~&gt;# systemctl restart sshd      #此时重启就不会报错了</div></pre></td></tr></table></figure>
+<blockquote>
+<p>删除端口标签</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# semanage port -d -t ssh_port_t -p tcp 2222      # 还可以将2222的删除</div></pre></td></tr></table></figure>
+<blockquote>
+<p>修改端口标签</p>
+</blockquote>
+<p>注意: 修改sellinux端口标签不是,修改端口的值,而是将端口号,移动到给另一个进程使用,此端口必须存在</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# semanage port -m -t ssh_port_t -p tcp 3389     # 将3389移动到 ssh监听 显示端口没定义</div><div class="line">ValueError: Port @tcp/3389 is not defined</div><div class="line">&lt;root: ~&gt;# semanage port -m -t http_port_t -p tcp 2222    # 表示将2222端口移动给http进程监听</div></pre></td></tr></table></figure>
+<h4 id="selinux布尔值"><a href="#selinux布尔值" class="headerlink" title="selinux布尔值"></a>selinux布尔值</h4><p>selinux定义了很多规则,认为危险的行为,都禁用了</p>
+<blockquote>
+<p>查看selinux的布尔值</p>
+</blockquote>
+<p><code>getsebool</code> :查看简要bool信息 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# getsebool -a | grep http   </div><div class="line">httpd_anon_write --&gt; off      # selinux认为httpd匿名可写是危险的行为,默认禁用了</div></pre></td></tr></table></figure>
+<p><code>semanage boolean -l</code> : 列出详细的描述信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# semanage boolean -l | grep httpd</div><div class="line">SELinux boolean                State  Default Description</div><div class="line">httpd_can_network_relay        (off  ,  off)  Allow httpd to can network relay</div></pre></td></tr></table></figure>
+<p><code>State</code> :表示当前的状态,当前生效的</p>
+<p><code>Default</code> 表示默认在selinux数据库中的策略,重启后生效</p>
+<blockquote>
+<p>设置 bool值命令</p>
+</blockquote>
+<p>有两种设置方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">setsebool [-P] boolean value（on,off）     -p : 表示 state和defaut 连个状态都开,不加表示只开 state</div><div class="line">setsebool [-P] Boolean=value（0，1）</div></pre></td></tr></table></figure>
+<p>例如:允许httpd家目录共享功能设置, httpd中<code>UserDir disabled</code> 指令</p>
+<p>注意:httpd程序自己也有控制访问的设置, 要想真正启用此功能,必须要在httpd配置文件中修改后,还要开启sellinux的控制,这里仅仅是开启selinux的设置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# getsebool -a | grep &quot;http.*dir&quot;          # 查到设置项的名称</div><div class="line">httpd_dontaudit_search_dirs --&gt; off</div><div class="line">httpd_enable_homedirs --&gt; off</div><div class="line">&lt;root: ~&gt;# setsebool -P httpd_enable_homedirs on    # 设置为启用httpd_enable_homedirs 为on</div></pre></td></tr></table></figure>
+<p>selinux日志管理</p>
+<p>selinux的日志管理需要安装一个软件包  <code>setroubleshoot</code>  重启后才能生效</p>
+<p>selinux会将错误日志写入/var/log/messages 中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root: ~]# tail /var/log/messages</div><div class="line">Sep  2 02:43:04 localhost setroubleshoot: SELinux is preventing /usr/sbin/httpd from getattr access on the file /var/www/html/index.html. For complete SELinux messages. run sealert -l cdcbb123-0bf1-478e-aaba-7b9f0148ab53</div></pre></td></tr></table></figure>
+<p>注意: selinux写入/var/log/messages 的日志非常简单,但是指示了 运行 <code>sealert -l cdcbb123-0bf1-478e-aaba-7b9f0148ab53</code> 查看详细内容, 后面是日志id号,</p>
+<p>当日志为太多运行grep命令查找关键词setroubleshoot  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">grep setroubleshoot  /var/log/messages</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/03/2017-09-03-selinux/" data-id="cj8fm2gbe000tx37x6gx9jy3c" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/semanage/">semanage</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2017/09/03/2017-09-03-bash/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          bash变量高级用法
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/08/24/2017-08-24-proc/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">进程管理</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#selinux概念"><span class="toc-number">1.</span> <span class="toc-text">selinux概念</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sellinux如何工作的"><span class="toc-number">1.1.</span> <span class="toc-text">sellinux如何工作的</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#selinux工作类型"><span class="toc-number">1.2.</span> <span class="toc-text">selinux工作类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#安全标签类型"><span class="toc-number">1.3.</span> <span class="toc-text">安全标签类型</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sellinux设置"><span class="toc-number">2.</span> <span class="toc-text">sellinux设置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#启用selinux"><span class="toc-number">2.1.</span> <span class="toc-text">启用selinux</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#给文件打标签"><span class="toc-number">2.2.</span> <span class="toc-text">给文件打标签</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#给端口打标签"><span class="toc-number">2.3.</span> <span class="toc-text">给端口打标签</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#selinux布尔值"><span class="toc-number">2.4.</span> <span class="toc-text">selinux布尔值</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--个人微信二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

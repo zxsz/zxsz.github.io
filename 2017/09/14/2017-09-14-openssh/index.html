@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>ssh客户端命令 | zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="ssh客户端ssh客户端有很多,window下xshell ,secureCRT ,putty 等 linux一般都是用 openssh,集成了客户端服务端,通用组件库等,还有一款轻便的 dropbear">
+<meta name="keywords" content="ssh">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ssh客户端命令">
+<meta property="og:url" content="http://yoursite.com/2017/09/14/2017-09-14-openssh/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:description" content="ssh客户端ssh客户端有很多,window下xshell ,secureCRT ,putty 等 linux一般都是用 openssh,集成了客户端服务端,通用组件库等,还有一款轻便的 dropbear">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-10-06T08:10:14.094Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ssh客户端命令">
+<meta name="twitter:description" content="ssh客户端ssh客户端有很多,window下xshell ,secureCRT ,putty 等 linux一般都是用 openssh,集成了客户端服务端,通用组件库等,还有一款轻便的 dropbear">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-09-14-openssh" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/09/14/2017-09-14-openssh/" class="article-date">
+  <time datetime="2017-09-13T16:00:00.000Z" itemprop="datePublished">2017-09-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/安全/">安全</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ssh客户端命令
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h3 id="ssh客户端"><a href="#ssh客户端" class="headerlink" title="ssh客户端"></a>ssh客户端</h3><p>ssh客户端有很多,window下xshell ,secureCRT ,putty 等 linux一般都是用 openssh,集成了客户端服务端,通用组件库等,还有一款轻便的 dropbear</p>
+<a id="more"></a>
+<h3 id="ssh命令基本用法"><a href="#ssh命令基本用法" class="headerlink" title="ssh命令基本用法"></a>ssh命令基本用法</h3><blockquote>
+<p>语法</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh [user@]remotehost [COMMAND]</div></pre></td></tr></table></figure>
+<blockquote>
+<p>选项</p>
+</blockquote>
+<p><code>-p</code> port : 指定远程端口,缺省为22 ,这个值可以在 <code>/etc/ssh/ssh_config</code> 中修改</p>
+<p><code>-b</code> :指定链接的源IP (客户端有多个ip时,需要用指定ip时用)</p>
+<p><code>-C</code> : 压缩方式,远程时压缩数据包后传送,一般没有必要</p>
+<p><code>-v</code> :查看登陆时的详细信息,通常用于调试排错</p>
+<p><code>-X</code> : 支持x11 转发,能传送服务器端的图形界面显示到本地 (需要服务器开启: <code>ForwardX11Trusted yes</code>  默认是开启的 )</p>
+<p><code>-Y</code> : 信任x11 转发</p>
+<h3 id="ssh登陆方式"><a href="#ssh登陆方式" class="headerlink" title="ssh登陆方式"></a>ssh登陆方式</h3><p>登陆的简单过程是,客户端向服务器发起远程连接请求,服务器端收到消息后响应,客户端与服务器协商传输的ssh版本(v1,和v2) , 加密的方式(rsa,dsa等) .确定好后发送相应的密钥(<code>/etc/ssh/*</code> 目录下,不同版本的钥匙一共三对 ) 给客户端, 客户端收到发来的密钥检查文件  <code>~/.ssh/known_hosts</code> 下是否有之前信任过的公钥,没有的话需要用户输入 <code>yes</code> 信任此密钥,之后输入密码验证,或密钥认证 , 之后会自动协商对称密钥进行加密传输</p>
+<p>ssh有两种登陆方式:</p>
+<ul>
+<li>使用口令认证</li>
+<li>使用密钥认证</li>
+</ul>
+<blockquote>
+<p>口令认证</p>
+</blockquote>
+<p>口令认证是交互式的,不适合脚本的环境,和大规模的运维环境,而且口令再网上传输也不安全.</p>
+<blockquote>
+<p>使用密钥认证</p>
+</blockquote>
+<p>实现密钥认证的过程: </p>
+<p>1 客户端生成一对密钥,一般生成私钥即可,公钥是从私钥中提取,程序会自动进行</p>
+<p>2 将公钥copy到远程主机对应的家目录下 <code>~/.ssh/authorized_keys</code>  ,这是一个文件,如果有多个用户的公钥再这,要追加放进来,不能覆盖</p>
+<h4 id="实现密钥认证"><a href="#实现密钥认证" class="headerlink" title="实现密钥认证"></a>实现密钥认证</h4><blockquote>
+<p><code>ssh-keygen</code>生成密钥对</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-keygen -t rsa -P '123456' -f /root/.ssh/id_rsa</div></pre></td></tr></table></figure>
+<p>分析 : <code>-P</code> 指定加密私钥的密码, <code>-f</code> 指定生成的密钥名 (文件名不能随便命名,手动指定是为了,避免敲回车键) <code>-t</code>  指定加密方式 为rsa 缺省为rsa</p>
+<blockquote>
+<p>发送公钥到远程主机</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-copy-id -i /root/.ssh/id_rsa.pub root@172.18.5.60</div></pre></td></tr></table></figure>
+<p><code>-i</code> 指定公钥文件(不要复制私钥文件) </p>
+<blockquote>
+<p>公钥分发</p>
+</blockquote>
+<p>生产环境中,一般都是安装系统后已经copy好公钥到.远程主机,或者使用脚本分发,脚本如下:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>!/bin/bash</div><div class="line"><span class="meta">#</span> expect 脚本copy密钥自动输入密码</div><div class="line">copy_key() &#123;</div><div class="line">    expect &lt;&lt; EOF</div><div class="line">set timeout 3</div><div class="line">spawn ssh-copy-id -i $key_name $&#123;2&#125;@$&#123;1&#125;</div><div class="line">    expect &#123;</div><div class="line">    "(yes/no)?" &#123; send "yes\n";exp_continue &#125;</div><div class="line">    "password" &#123; send "$&#123;3&#125;\n";exp_continue &#125;</div><div class="line">&#125;</div><div class="line">expect eof</div><div class="line">EOF</div><div class="line">&#125;</div><div class="line"><span class="meta">#</span> 设置主机列表格式为每行 ip host password (eg: 172.18.5.60 root 123456)</div><div class="line">host_list=/tmp/host.txt</div><div class="line"><span class="meta">#</span> 指定公钥文件位置</div><div class="line">key_name=/root/.ssh/id_rsa.pub</div><div class="line"></div><div class="line">if ! rpm -q expect &amp;&gt;/dev/null;then</div><div class="line">    yum install -y q expect || exit 3</div><div class="line">fi</div><div class="line">[ ! -e $host_list ] &amp;&amp; echo "Error:create a host list before." &amp;&amp; exit 2</div><div class="line">ip=(`awk '&#123;print $1&#125;' $host_list`)</div><div class="line">user=(`awk '&#123;print $2&#125;' $host_list`)</div><div class="line">password=(`awk '&#123;print $3&#125;' $host_list`)</div><div class="line"></div><div class="line">for((i=0;i&lt;$&#123;#ip[*]&#125;;i++));do</div><div class="line">    &#123;</div><div class="line">    copy_key $&#123;ip[$i]&#125; $&#123;user[$i]&#125; $&#123;password[$i]&#125; &amp;&gt;/dev/null</div><div class="line">    if [ $? -eq 1 ];then</div><div class="line">         echo -e "$&#123;ip[$i]&#125; : send ssh_key[\033[32m success \033[0m]"</div><div class="line">    else</div><div class="line">         echo -e "$&#123;ip[$i]&#125; : send ssh_key[\033[31m failure \033[0m]"</div><div class="line">    fi</div><div class="line">    &#125; &amp;</div><div class="line">done</div><div class="line">wait</div></pre></td></tr></table></figure>
+<blockquote>
+<p>windons下生成密钥,一样原理xshell为例:</p>
+</blockquote>
+<p>工具–&gt; 用户密钥管理者–&gt;生成–&gt;copy到主机即可</p>
+<h4 id="密钥代理"><a href="#密钥代理" class="headerlink" title="密钥代理"></a>密钥代理</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">ssh-agent bash               # 启动代理</div><div class="line">ssh-add                      # 将密码交给agent代理 仅需输入一次私钥口令</div></pre></td></tr></table></figure>
+<p>注意: 托管后本次会话,不需要输入密码,但安全起见终端退出后失效</p>
+<h3 id="基于ssh远程copy命令"><a href="#基于ssh远程copy命令" class="headerlink" title="基于ssh远程copy命令"></a>基于ssh远程copy命令</h3><h4 id="scp命令"><a href="#scp命令" class="headerlink" title="scp命令"></a>scp命令</h4><blockquote>
+<p>语法</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">scp [options] [user@]host:/sourcefile /destpath       #语法和cp命令一样</div></pre></td></tr></table></figure>
+<blockquote>
+<p>常用选项</p>
+</blockquote>
+<p><code>-C</code> :压缩数据流</p>
+<p><code>-r</code> :递归复制,复制目录用</p>
+<p><code>-p</code> :保持元属性</p>
+<p><code>-P</code> :指定端口</p>
+<p>注意: scp 适合小文件的简单复制,而且目标文件如果存在且一摸一样,会覆盖,影响效率</p>
+<h4 id="rsync-命令"><a href="#rsync-命令" class="headerlink" title="rsync 命令"></a>rsync 命令</h4><p>rysnc作用是基于ssh和rsh服务实现高效率的远程系统之间复制文件,属于增量备份,而且可以定义复制特定的文件,实现任务计划自动同步. 客户端命令的基本用法为:</p>
+<blockquote>
+<p>语法</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">rsync [OPTION...] [USER@]HOST:SRC... [DEST]   # 复制到本地</div><div class="line">rsync [OPTION...] SRC... [USER@]HOST:DEST     # 推送到远程主机</div></pre></td></tr></table></figure>
+<blockquote>
+<p>常用选项</p>
+</blockquote>
+<p><code>n</code>  模拟复制过程</p>
+<p><code>-v</code>  显示详细过程</p>
+<p><code>-r</code>  递归复制目录树</p>
+<p><code>-p</code>  保留权限</p>
+<p><code>-t</code>  保留时间戳</p>
+<p><code>-g</code>  保留组信息</p>
+<p><code>-o</code>保留所有者信息</p>
+<p><code>-l</code> 将软链接文件本身进行复制（默认）</p>
+<p><code>-L</code> 将软链接文件指向的文件复制</p>
+<p><code>-a</code>  存档，相当于–rlptgoD，但不保留ACL（-A）和SELinux属性（-X）</p>
+<blockquote>
+<p>例子</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">rsync -av 172.18.5.61:/etc/ /tmp/             # 注意两条命令的区别</div><div class="line">rsync -av 172.18.5.61:/etc /tmp/</div></pre></td></tr></table></figure>
+<p>rsync 命令行用法和 scp几乎一样, 只是rsync 不是全部赋值,只复制不同的文件</p>
+<h3 id="sshd服务端配置"><a href="#sshd服务端配置" class="headerlink" title="sshd服务端配置"></a>sshd服务端配置</h3><p>sshd的服务是服务器必须开放的一个,容易被扫描到,以及暴力破解,通常需要做的优化配置有一下方面</p>
+<p>修改的配置文件为 <code>/etc/ssh/sshd_config</code> </p>
+<ul>
+<li>禁用管理员root账户直接登陆远程主机, root直接登陆网络上传输容易被别人抓包获取,虽然时加密过的,但是也有暴力破解分析的手段,所以要禁止</li>
+<li>更改默认监听的端口,22端口人人皆知,改成其他端口迷惑别人</li>
+<li>控制特定的ip访问,不要监听所有IP,只允许特定ip访问</li>
+<li>限制用户登陆</li>
+<li>不要使用不安全的 ssh v1 版本</li>
+<li>使用基于密钥认证 (密钥认证方便管理,而且比口令登录更安全)</li>
+</ul>
+<p>基于默认配置可以更改为如下配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">UseDNS no                                # 禁止解析DNS 可提高链接速度  默认yes</div><div class="line">GSSAPIAuthentication no                  # 运行GSSAPI 认证可以改为no 可以提供连接速度 默认yes</div><div class="line">Port XXX                                 # 该端口 为了安全    默认22</div><div class="line">ListenAddress X.X.X.X                    # 改为指定ip,192.18.1.0 表示网段  # 默认全部监听</div><div class="line">PermitRootLogin no                       # 建议改成no  默认yes</div><div class="line">MaxAuthTries 6                           # 最多尝试密码次数 ,保持默认</div><div class="line">PermitEmptyPasswords no                  # 不允许空密码 保持默认</div><div class="line">AllowUsers user1 user2 user3             # 白名单登陆用户列表,默认没有自己添加</div><div class="line">AllowGroups group1 group2                # 白名单登陆组列表,默认没有 ,对应还有 deny的黑名单</div></pre></td></tr></table></figure>
+<p>更多配置参考<a href="http://www.jinbuguo.com/openssh/sshd_config.html" target="_blank" rel="external">sshd_config 中文手册</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/09/14/2017-09-14-openssh/" data-id="cj8fm2gbx0015x37x1dwxjb9r" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ssh/">ssh</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2017/09/14/2017-09-14-ssh_tunnel/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          ssh隧道技术
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/09/10/2017-09-10-openssl/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">opessl和CA</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#ssh客户端"><span class="toc-number">1.</span> <span class="toc-text">ssh客户端</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ssh命令基本用法"><span class="toc-number">2.</span> <span class="toc-text">ssh命令基本用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ssh登陆方式"><span class="toc-number">3.</span> <span class="toc-text">ssh登陆方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#实现密钥认证"><span class="toc-number">3.1.</span> <span class="toc-text">实现密钥认证</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#密钥代理"><span class="toc-number">3.2.</span> <span class="toc-text">密钥代理</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于ssh远程copy命令"><span class="toc-number">4.</span> <span class="toc-text">基于ssh远程copy命令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#scp命令"><span class="toc-number">4.1.</span> <span class="toc-text">scp命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#rsync-命令"><span class="toc-number">4.2.</span> <span class="toc-text">rsync 命令</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sshd服务端配置"><span class="toc-number">5.</span> <span class="toc-text">sshd服务端配置</span></a></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--个人微信二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>进程管理 | zxs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="linux进程管理操作系统的内存空间,简单可以认为分用户空间和内核空间,内核负责管理分配内存.在单个进程看来整个内存中只有自己和内核存在.内核总通过维护一张数据结构task structure的表,记录包括进程id,进程的父子进程id,程序运行到哪个阶段,内存地址真正指向物理内存的位置等等.">
+<meta name="keywords" content="ps,top">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进程管理">
+<meta property="og:url" content="http://yoursite.com/2017/08/24/2017-08-24-proc/index.html">
+<meta property="og:site_name" content="zxs">
+<meta property="og:description" content="linux进程管理操作系统的内存空间,简单可以认为分用户空间和内核空间,内核负责管理分配内存.在单个进程看来整个内存中只有自己和内核存在.内核总通过维护一张数据结构task structure的表,记录包括进程id,进程的父子进程id,程序运行到哪个阶段,内存地址真正指向物理内存的位置等等.">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://47.91.157.219/images/memory.png">
+<meta property="og:image" content="http://47.91.157.219/images/top1.png">
+<meta property="og:image" content="http://47.91.157.219/images/top2.png">
+<meta property="og:updated_time" content="2017-10-06T08:10:14.081Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="进程管理">
+<meta name="twitter:description" content="linux进程管理操作系统的内存空间,简单可以认为分用户空间和内核空间,内核负责管理分配内存.在单个进程看来整个内存中只有自己和内核存在.内核总通过维护一张数据结构task structure的表,记录包括进程id,进程的父子进程id,程序运行到哪个阶段,内存地址真正指向物理内存的位置等等.">
+<meta name="twitter:image" content="http://47.91.157.219/images/memory.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zxs" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zxs</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">go big or go home</a>
+        </h2>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-2017-08-24-proc" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/08/24/2017-08-24-proc/" class="article-date">
+  <time datetime="2017-08-23T16:00:00.000Z" itemprop="datePublished">2017-08-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/linux基础/">linux基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      进程管理
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h3 id="linux进程管理"><a href="#linux进程管理" class="headerlink" title="linux进程管理"></a>linux进程管理</h3><p>操作系统的内存空间,简单可以认为分用户空间和内核空间,内核负责管理分配内存.在单个进程看来整个内存中只有自己和内核存在.内核总通过维护一张数据结构<code>task structure</code>的表,记录包括进程id,进程的父子进程id,程序运行到哪个阶段,内存地址真正指向物理内存的位置等等.</p>
+<a id="more"></a>
+<h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p><code>线性地址空间</code>:内核虚拟出一段连续的内存,在物理内存中不是连续的</p>
+<p><code>物理地址空间</code>:实际硬件的的地址</p>
+<p><code>保存现场</code>:多个进程在用户看来是同时运行的,但在cpu看来,同一个时间点只有一个程序在运行,cpu是将自己的计算能力,按时间分成时间片(毫秒级的),每个程序在cpu上运行一段时间如果程序还没有运行完,内核不能让进程一直占用cpu,这个让进程下去,并保存进程运行到那个阶段,这个过程叫做保存现场.</p>
+<p><code>恢复现场</code>:内核调用之前没有运行完的程序,会查记录这个程序之前运行到那个阶段,并恢复后让程序从之前断开的地方继续进行.</p>
+<p><code>context switch</code>:多个进程和内核来回切换到cpu上运行</p>
+<p><code>task structure</code>:任务结构,保存了各个进程的相关信息</p>
+<p><code>process</code>:被调到内存和cpu上运行的程序</p>
+<p><code>thread</code> :比进程更小的单位,一个进程只能运行在cpu的一个核上,如果一个比较复杂的进程中一些任务可以互补依赖的独立运行就将这个进程分成多个线程,让他们能运行在不同的cpu上且共享内存空间,避免浪费.</p>
+<p><code>CoW</code> :写时复制 Copy only Write 创建Fork()  复制Clone(),一种进程创建子进程的机制</p>
+<p><code>Big O</code>:描述程序运行消耗的时间和处理数据大小的关系</p>
+<p>如下图是进程内存中的图:<br>    <img src="http://47.91.157.219/images/memory.png" alt="image"></p>
+<p><code>Page Frame</code>:类似逻辑卷中的PE,指线性内存中的最小单位4K</p>
+<p><code>LRU</code>: Least Recentlly Used 近期最少使用算法,内存是有限的,内核将最近<br>使用最小的进程剔除释放内存,提供给新的进程使用,缓存也是用相同的算法</p>
+<p><code>MMU</code>: Memory Management Unit 内存管理单元,内核的功能,内核将物理内存虚拟层可连续<br>可扩展的线性内存提供的给进程使用,它维护了一张虚拟内存和物理内存的对应关系的表</p>
+<p><code>TLB</code>:Translation Lookaside Buffer 翻译后备缓冲器,用于保存虚拟地址和物理地址映射关系的缓存,主要为了加快速度,避免每次<br>都要去查找MMU中的记录</p>
+<p><code>IPC</code>:Inter Process Communication,进程间的通信</p>
+<blockquote>
+<p>进程在同一个主机上的通信机制:</p>
+</blockquote>
+<ol>
+<li>signal</li>
+</ol>
+<p><code>kill -l</code> , <code>trap -l</code> 可以查看centos信号的种类,运维人员必须要的到的有</p>
+<pre><code>1) SIGHUP          #通知进程不重启从读配置文件
+2) SIGINT          #中断,类似中断下crtl+c
+9) SIGKILL         #强制程序终止,相当与直接拔电源那种
+15) SIGTERM        #关闭进程,通知进程正常关闭一些自己正在操作的文件
+</code></pre><ol>
+<li><p>shm:shared memory  共享内存,一个进程加工出来好数据后给里一个进程使用</p>
+</li>
+<li><p>semaphore ,多线程模型中控制线程合理使用公共资源的东西,运维不用了解太深.</p>
+</li>
+</ol>
+<blockquote>
+<p>进程在不同主机上的通信机制</p>
+</blockquote>
+<p><code>rpc</code>:Remote Procedure Call  远程过程调用 例如 <code>NFS</code>(linux主机中共享文件的一个服务)</p>
+<p><code>socket</code>: IP和端口号 利用tcp/udp协议</p>
+<h3 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h3><p>命令<code>top</code>可以查看所有的进程的状态信息<br><img src="http://47.91.157.219/images/top1.png" alt="image"></p>
+<p>如图: 1核的cpu下,绝大部为情况下,看到<code>running</code> 的数量都是1,表示了一个进程只能在一个,cpu上允许,大多数都是处于休眠态</p>
+<ol>
+<li><p>运行态:running</p>
+</li>
+<li><p>就绪态:ready</p>
+</li>
+<li><p>睡眠态</p>
+</li>
+</ol>
+<h3 id="程序管理命令"><a href="#程序管理命令" class="headerlink" title="程序管理命令"></a>程序管理命令</h3><h4 id="查看进程ps命令"><a href="#查看进程ps命令" class="headerlink" title="查看进程ps命令"></a>查看进程ps命令</h4><p>ps有两种显示风格(早期UNIX的两大分支 system V 和 BSD)</p>
+<blockquote>
+<p>BSD风格 (选项不带”-“)</p>
+</blockquote>
+<p>a       :显示所有跟终端有关的进程</p>
+<p>x        :显示所有跟终端无关的进程</p>
+<p>u        :显示发起进程的用户和其他一些字段</p>
+<p>f       :显示父子进程关系</p>
+<p>o         :显示指定的字段逗号分开<br>        pid、comm、%cpu、%mem、state、tty、euser(effict user)、ruser(realuser)..</p>
+<p>-C  conmand  :显示指定命令的进程相关信息</p>
+<p>常用组合</p>
+<pre><code>ps aux                               # 显示所有的进程包括跟终端有关和无关的
+ps axo user,pid,comm...              # 只显示指定的字段,
+</code></pre><blockquote>
+<p>system V 风格</p>
+</blockquote>
+<pre><code>ps -ef         #f显示的内容比较全面类似 ps aux
+</code></pre><blockquote>
+<p>ps aux显示字段含义</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">[root: ~]# ps aux</div><div class="line">USER        PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND</div><div class="line">root          1  0.0  0.3  19356  1548 ?        Ss   00:22   0:01 /sbin/init</div><div class="line">root          2  0.0  0.0      0     0 ?        S    00:22   0:00 [kthreadd]</div><div class="line">root          3  0.0  0.0      0     0 ?        S    00:22   0:00 [migration/0]</div><div class="line">root          4  0.0  0.0      0     0 ?        S    00:22   0:00 [ksoftirqd/0]</div><div class="line">root          5  0.0  0.0      0     0 ?        S    00:22   0:00 [stopper/0]</div><div class="line">root          6  0.0  0.0      0     0 ?        S    00:22   0:00 [watchdog/0]</div><div class="line">root          7  0.1  0.0      0     0 ?        R    00:22   0:39 [events/0]</div></pre></td></tr></table></figure>
+<p><code>%CPU</code>:占用cpu的百分比</p>
+<p><code>%MEM</code>:占用内存的百分比</p>
+<p><code>TIME</code>:指在cpu上运行的时间总和,休眠状态不算在内</p>
+<p><code>VSZ</code>: Virtual memory SiZe，虚拟内存集，线性内存</p>
+<p><code>RSS</code>: ReSident Size, 常驻内存集</p>
+<p><code>[.*]</code>: 中括号表示内核进程</p>
+<p><code>STAT</code>：进程状态</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">R：running</div><div class="line">S: interruptable sleeping</div><div class="line">D: uninterruptable sleeping</div><div class="line">T: stopped</div><div class="line">Z: zombie</div><div class="line">+: 前台进程</div><div class="line">l: 多线程进程</div><div class="line">L：内存分页并带锁</div><div class="line">N：低优先级进程</div><div class="line">&lt;: 高优先级进程</div><div class="line">s: session leader，会话（子进程）发起者</div></pre></td></tr></table></figure>
+<h4 id="优先级命令"><a href="#优先级命令" class="headerlink" title="优先级命令"></a>优先级命令</h4><p>静态优先级：100-139,<br>进程默认启动时的nice值为0，优先级为120,<br>只有根用户才能降低nice值（提高优先性）.</p>
+<blockquote>
+<p>调整已经启动的进程</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">renice -10 PID</div></pre></td></tr></table></figure>
+<blockquote>
+<p>启动是调整优先级nice</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nice -n -10 vim f1</div></pre></td></tr></table></figure>
+<h4 id="搜索进程命令pgreg"><a href="#搜索进程命令pgreg" class="headerlink" title="搜索进程命令pgreg"></a>搜索进程命令pgreg</h4><blockquote>
+<p>语法:pgrep [options] pattern</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">-u euid: effective user，生效者</div><div class="line">-U uid: real user，真正发起运行命令者</div><div class="line">-t terminal: 与指定终端相关的进程</div><div class="line">-l: 显示进程名</div><div class="line">-a: 显示完整格式的进程名</div><div class="line">-P pid: 显示指定进程的子进程</div></pre></td></tr></table></figure>
+<blockquote>
+<p>语法:pidof PNAME<br>根据进程名查找pid,可用于判断进程是否启动,适用于脚本</p>
+</blockquote>
+<h4 id="查看系统运行-负载时间uptime"><a href="#查看系统运行-负载时间uptime" class="headerlink" title="查看系统运行,负载时间uptime"></a>查看系统运行,负载时间uptime</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">[root: ~]# uptime</div><div class="line"> 10:46:12 up 10:23,  2 users,  load average: 0.00, 0.00, 0.00</div></pre></td></tr></table></figure>
+<p>每列分别表示 :</p>
+<p>当前时间 运行时间   上线人数     每1,5,10 分钟平均内进程队列长度 (平均负载)</p>
+<p>平均负载可与判断系统当前的繁忙程度</p>
+<p>如果linux主机是1个双核CPU，如果load average每项的指标都是在1以上,就代表cpu一直在处理<br>事务,因为1表示后面还有1个进程在排队,如果几个指标一直处于5,那就要赶紧查查是怎么回事了,cpu已经忙不过来了</p>
+<blockquote>
+<p>动态查看系统性能top</p>
+</blockquote>
+<p>   <img src="http://47.91.157.219/images/top2.png" alt="image">        </p>
+<p>栏位信息简介</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">us：用户空间</div><div class="line">sy：内核空间</div><div class="line">ni：调整nice时间</div><div class="line">id：空闲</div><div class="line">wa：等待IO时间</div><div class="line">hi：硬中断</div><div class="line">si：软中断（模式切换）</div><div class="line">st：虚拟机偷走的时间</div></pre></td></tr></table></figure>
+<p>top 命令时交互命令默认每三秒刷新一次,排序为cpu从高到低</p>
+<blockquote>
+<p>改变排序：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">P：以占据的CPU百分比,%CPU </div><div class="line">M：占据内存百分比,%MEM </div><div class="line">T：累积占据CPU时长,TIME+</div></pre></td></tr></table></figure>
+<h4 id="内存监控工具"><a href="#内存监控工具" class="headerlink" title="内存监控工具"></a>内存监控工具</h4><p>语法 vmstat [options] [delay [count]]            </p>
+<p>vmstat 不加任何选项默认只显示一次<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vmstat 2 5       #每2秒刷新一次一共刷5次</div></pre></td></tr></table></figure></p>
+<blockquote>
+<p>vmstat输出结果显示</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;root: ~&gt;# vmstat 2</div><div class="line">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----</div><div class="line"> r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st</div><div class="line"> 2  0      0 228472    948 170956    0    0     6     1  187   62  0  0 100  0  0</div><div class="line"> 0  0      0 228456    948 170956    0    0     0     0  438   36  0  0 100  0  0</div><div class="line"> 0  0      0 215200    948 170992    0    0     0     0  396   82  1  2 97  0  0</div><div class="line"> 0  0      0 215200    948 170992    0    0     0     0  438   61  0  1 99  0  0</div></pre></td></tr></table></figure>
+<p>procs:</p>
+<p><code>r</code>：可运行（正运行或等待运行）进程的个数，和核心数有关</p>
+<p><code>b</code>：处于不可中断睡眠态的进程个数(被阻塞的队列的长度)</p>
+<p>memory：</p>
+<p><code>swpd</code>: 交换内存的使用总量</p>
+<p><code>free</code>：空闲物理内存总量</p>
+<p><code>buffer</code>：用于buffer的内存总量</p>
+<p><code>cache</code>：用于cache的内存总量</p>
+<p>swap:</p>
+<p><code>si</code>：从磁盘交换进内存的数据速率(kb/s)</p>
+<p><code>so</code>：从内存交换至磁盘的数据速率(kb/s)</p>
+<p><code>io</code>：</p>
+<p><code>bi</code>：从块设备读入数据到系统的速率(kb/s)</p>
+<p><code>bo</code>: 保存数据至块设备的速率</p>
+<p>system：</p>
+<p><code>in</code>: interrupts 中断速率，包括时钟</p>
+<p><code>cs</code>: context switch 进程切换速率</p>
+<p>cpu：</p>
+<p><code>us</code>:Time spent running non-kernel code</p>
+<p><code>sy</code>: Time spent running kernel code</p>
+<p><code>id</code>: Time spent idle. Linux 2.5.41前,包括IO-wait time.</p>
+<p><code>wa</code>: Time spent waiting for IO. 2.5.41前，包括in idle.</p>
+<p><code>st</code>: Time stolen from a virtual machine. 2.6.11前, unknown.</p>
+<p>注意:si,so,bi,bo 是以物理内存为参考,描述input和output</p>
+<p>dstat命令：系统资源统计,代替vmstat,iostat</p>
+<p>不加任何选项下默认会不停的刷新输出</p>
+<p>语法: dstat [-afv] [options..] [delay [count]]</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">-c: 显示cpu相关信息</div><div class="line">-C #,#,...,total</div><div class="line">-d: 显示disk相关信息</div><div class="line">-D total,sda,sdb,...</div><div class="line">-g：显示page相关统计数据</div><div class="line">-m: 显示memory相关统计数据</div><div class="line">-n: 显示network相关统计数据</div><div class="line">-p: 显示process相关统计数据</div><div class="line">-r: 显示io请求相关的统计数据</div><div class="line">-s: 显示swapped相关的统计数据</div><div class="line">--top-cpu：显示最占用CPU的进程</div><div class="line">--top-io: 显示最占用io的进程</div><div class="line">--top-mem: 显示最占用内存的进程</div><div class="line">--top-latency: 显示延迟最大的进程</div></pre></td></tr></table></figure>
+<h4 id="kill命令"><a href="#kill命令" class="headerlink" title="kill命令"></a>kill命令</h4><p>kill,pkill,killall</p>
+<blockquote>
+<p>按PID：kill [-SIGNAL] pid …</p>
+<p>按名称：killall [-SIGNAL] comm…</p>
+<p>按模式：pkill [options] pattern</p>
+</blockquote>
+<p>-u uid: effective user，生效者</p>
+<p>-U uid: real user，真正发起运行命令者</p>
+<p>-t terminal: 与指定终端相关的进程</p>
+<p>-l: 显示进程名（pgrep可用）</p>
+<p>-a: 显示完整格式的进程名（pgrep可用）</p>
+<p>-P pid: 显示指定进程的子进</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/08/24/2017-08-24-proc/" data-id="cj8fm2gb6000mx37xpgq2ch0y" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ps/">ps</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/top/">top</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2017/09/03/2017-09-03-selinux/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          sellinux简单介绍
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/08/22/2017-08-22-nmcli/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">centos7,nmcli工具</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#linux进程管理"><span class="toc-number">1.</span> <span class="toc-text">linux进程管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基本概念"><span class="toc-number">2.</span> <span class="toc-text">基本概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#进程状态"><span class="toc-number">3.</span> <span class="toc-text">进程状态</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#程序管理命令"><span class="toc-number">4.</span> <span class="toc-text">程序管理命令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#查看进程ps命令"><span class="toc-number">4.1.</span> <span class="toc-text">查看进程ps命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#优先级命令"><span class="toc-number">4.2.</span> <span class="toc-text">优先级命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#搜索进程命令pgreg"><span class="toc-number">4.3.</span> <span class="toc-text">搜索进程命令pgreg</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#查看系统运行-负载时间uptime"><span class="toc-number">4.4.</span> <span class="toc-text">查看系统运行,负载时间uptime</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#内存监控工具"><span class="toc-number">4.5.</span> <span class="toc-text">内存监控工具</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#kill命令"><span class="toc-number">4.6.</span> <span class="toc-text">kill命令</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--个人微信二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2017 zxs&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;zhangxingshi@aliyun.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>
